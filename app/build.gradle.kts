@@ -18,15 +18,25 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // No translated strings of our own, and this trims the localized
+        // accessibility/system strings AndroidX libraries otherwise bundle
+        // for ~70 languages we never display.
+        resConfigs("en")
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Signed with the auto-generated debug key so CI can produce an
+            // installable APK without any real signing secrets. This build is
+            // for sideloaded testing, not a Play Store release.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

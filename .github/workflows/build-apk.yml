@@ -28,14 +28,17 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Build minified, resource-shrunk release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Rename for the stable demo asset name
+        run: cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-debug.apk
 
       - name: Upload APK as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-cookbook-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: my-cookbook-release-apk
+          path: app/build/outputs/apk/release/app-debug.apk
 
       - name: Publish APK to demo release
         uses: softprops/action-gh-release@v2
@@ -43,11 +46,19 @@ jobs:
           tag_name: demo-apk
           name: "My Cookbook - Demo APK"
           body: |
-            Auto-built debug APK of My Cookbook from the latest push to `claude/android-recipe-app-0is30s`.
+            Auto-built demo APK of My Cookbook from the latest push to `claude/android-recipe-app-0is30s`.
 
-            **To install:** download `app-debug.apk` to your Android phone (Android 8.0+), open it, and allow installs from unknown sources when prompted.
+            This is a minified, resource-shrunk release build (R8 code
+            shrinking + unused-resource removal), signed with an
+            auto-generated debug key so it installs directly without a Play
+            Store account. Asset is still named `app-debug.apk` to keep the
+            download link stable across builds.
+
+            **To install:** download `app-debug.apk` to your Android phone
+            (Android 8.0+), open it, and allow installs from unknown sources
+            when prompted.
 
             This asset is replaced on every push — always the latest build.
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: app/build/outputs/apk/release/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
