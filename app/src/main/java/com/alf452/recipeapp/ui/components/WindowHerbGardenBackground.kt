@@ -14,31 +14,57 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import kotlin.math.cos
 import kotlin.math.sin
 
-private val SkyTop = Color(0xFF6EC0E8)
-private val SkyHorizon = Color(0xFFDCF3FF)
-private val SunColor = Color(0xFFFFD54F)
-private val GrassGreen = Color(0xFF7CB342)
-private val GrassShadow = Color(0xFF5C8A2E)
-private val TreeTrunk = Color(0xFF6D4C41)
-private val TreeFoliage = Color(0xFF66BB6A)
-private val PondBlue = Color(0xFF4FC3F7)
-private val PondDeep = Color(0xFF29ABE2)
-private val DuckBody = Color(0xFFFFFDE7)
-private val DuckBeak = Color(0xFFFFA000)
-private val WindowFrame = Color(0xFFFAF6EE)
-private val WindowFrameShadow = Color(0x22000000)
+// Palette drawn from Van Gogh's "Almond Blossom": deep cerulean sky worked in
+// visible directional strokes, dark branch silhouettes, white and blush-pink
+// blossom dabs, bold Japanese-print-style outlines.
+private val SkyDeep = Color(0xFF1B5FA6)
+private val SkyLight = Color(0xFF5AA0D8)
+private val SkyStroke1 = Color(0xFF2E6DB4)
+private val SkyStroke2 = Color(0xFF6FB0DB)
+private val SkyStroke3 = Color(0xFF14477E)
+private val SkyStroke4 = Color(0xFF8FC4E8)
+
+private val SunCore = Color(0xFFFCE178)
+private val SunMid = Color(0xFFF2A93B)
+private val SunGlow = Color(0xFFF4C542)
+
+private val BranchColor = Color(0xFF2B1B12)
+private val BlossomWhite = Color(0xFFFFFBF2)
+private val BlossomPink = Color(0xFFEFA9C0)
+private val BlossomCenter = Color(0xFF8B5E3C)
+
+private val GrassBase = Color(0xFF5D7F2E)
+private val GrassStroke1 = Color(0xFF7FA33F)
+private val GrassStroke2 = Color(0xFF3F5E1E)
+private val GrassStroke3 = Color(0xFF9CBE55)
+private val GrassOutline = Color(0xFF2B3F16)
+
+private val PondBlue = Color(0xFF2E6DB4)
+private val PondHighlight = Color(0xFFBFE1F5)
+private val PondOutline = Color(0xFF12395F)
+
+private val DuckBody = Color(0xFFFFF8E7)
+private val DuckBeak = Color(0xFFE8871E)
+private val DuckOutline = Color(0xFF2B1B12)
+
+private val WindowFrame = Color(0xFFF5EFDD)
+private val WindowOutline = Color(0xFF2B1B12)
+
 private val SillWood = Color(0xFF6D4C41)
-private val SillWoodHighlight = Color(0xFF8D6247)
-private val PotColor = Color(0xFFBF6F4A)
-private val PotRim = Color(0xFFA85736)
-private val LeafGreen = Color(0xFF4C8C4A)
-private val LeafGreenLight = Color(0xFF6FAF57)
+private val SillGrainDark = Color(0xFF4A3025)
+private val SillGrainLight = Color(0xFF8A6650)
+
+private val PotColor = Color(0xFFC1652E)
+private val PotOutline = Color(0xFF2B1B12)
+private val LeafSage = Color(0xFF6B8E3A)
+private val LeafOlive = Color(0xFF7FA33F)
 
 /**
- * A window looking out onto a sunny park with a duck pond, with a row of
- * herb pots growing on the sill beneath the glass. Replaces a flat color
- * banner behind the main menu's top app bar. Fully procedural (Canvas),
- * no image assets.
+ * A window looking out on a sunny park, painted in short directional strokes
+ * rather than flat cartoon fills — deep cerulean sky, almond-blossom-style
+ * branches with dabbed blossom clusters, and bold dark outlines, in the
+ * spirit of Van Gogh's "Almond Blossom." Herb pots grow on the sill beneath
+ * the glass. Fully procedural (Canvas), no image assets.
  */
 @Composable
 fun WindowHerbGardenBackground(modifier: Modifier = Modifier) {
@@ -56,7 +82,7 @@ private fun DrawScope.drawScene() {
 
     drawSky(w, sillTop)
     drawSun(w, sillTop)
-    drawGrassAndTrees(w, sillTop)
+    drawGrassAndBranches(w, sillTop)
     drawPondAndDucks(w, sillTop)
     drawWindowFrame(w, sillTop)
     drawSill(w, h, sillTop)
@@ -65,65 +91,145 @@ private fun DrawScope.drawScene() {
 
 private fun DrawScope.drawSky(w: Float, sillTop: Float) {
     drawRect(
-        brush = Brush.verticalGradient(
-            colors = listOf(SkyTop, SkyHorizon),
-            startY = 0f,
-            endY = sillTop
-        ),
+        brush = Brush.verticalGradient(colors = listOf(SkyDeep, SkyLight), startY = 0f, endY = sillTop),
         size = Size(w, sillTop)
     )
+
+    val strokeColors = listOf(SkyStroke1, SkyStroke2, SkyStroke3, SkyStroke4)
+    val rows = 6
+    val cols = 9
+    val rowHeight = sillTop / rows
+    for (row in 0 until rows) {
+        val y = rowHeight * (row + 0.5f)
+        for (col in 0 until cols) {
+            val x = w * (col + 0.5f) / cols
+            val color = strokeColors[(row + col) % strokeColors.size]
+            val angleDeg = if ((row + col) % 2 == 0) 22f else -16f
+            val len = (w / cols) * 0.95f
+            val rad = Math.toRadians(angleDeg.toDouble())
+            val dx = (cos(rad) * len / 2).toFloat()
+            val dy = (sin(rad) * len / 2).toFloat()
+            drawLine(
+                color = color.copy(alpha = 0.5f),
+                start = Offset(x - dx, y - dy),
+                end = Offset(x + dx, y + dy),
+                strokeWidth = rowHeight * 0.55f,
+                cap = StrokeCap.Round
+            )
+        }
+    }
 }
 
 private fun DrawScope.drawSun(w: Float, sillTop: Float) {
-    val center = Offset(w * 0.16f, sillTop * 0.28f)
-    val baseRadius = w * 0.045f
-    listOf(3.2f to 0.10f, 2.1f to 0.16f, 1.4f to 0.22f).forEach { (mult, alpha) ->
-        drawCircle(color = SunColor.copy(alpha = alpha), radius = baseRadius * mult, center = center)
+    val center = Offset(w * 0.20f, sillTop * 0.22f)
+    val baseRadius = w * 0.05f
+
+    drawCircle(color = SunGlow.copy(alpha = 0.20f), radius = baseRadius * 2.6f, center = Offset(center.x + 2f, center.y - 1f))
+    drawCircle(color = SunGlow.copy(alpha = 0.30f), radius = baseRadius * 1.8f, center = Offset(center.x - 1f, center.y + 1f))
+
+    val rayAngles = listOf(15f, 55f, 95f, 135f, 175f, 215f, 255f, 295f, 335f)
+    rayAngles.forEach { deg ->
+        val rad = Math.toRadians(deg.toDouble())
+        val start = Offset(
+            center.x + (cos(rad) * baseRadius * 1.25).toFloat(),
+            center.y + (sin(rad) * baseRadius * 1.25).toFloat()
+        )
+        val end = Offset(
+            center.x + (cos(rad) * baseRadius * 2.15).toFloat(),
+            center.y + (sin(rad) * baseRadius * 2.15).toFloat()
+        )
+        drawLine(color = SunMid.copy(alpha = 0.55f), start = start, end = end, strokeWidth = baseRadius * 0.16f, cap = StrokeCap.Round)
     }
-    drawCircle(color = SunColor, radius = baseRadius, center = center)
+
+    drawCircle(color = SunMid, radius = baseRadius * 1.12f, center = center)
+    drawCircle(color = SunCore, radius = baseRadius, center = center)
 }
 
-private fun DrawScope.drawGrassAndTrees(w: Float, sillTop: Float) {
-    val grassTop = sillTop * 0.62f
-    drawRect(
-        color = GrassGreen,
-        topLeft = Offset(0f, grassTop),
-        size = Size(w, sillTop - grassTop)
-    )
-    drawLine(
-        color = GrassShadow,
-        start = Offset(0f, grassTop),
-        end = Offset(w, grassTop),
-        strokeWidth = 2f
-    )
+private fun DrawScope.drawGrassAndBranches(w: Float, sillTop: Float) {
+    val grassTop = sillTop * 0.60f
+    drawRect(color = GrassBase, topLeft = Offset(0f, grassTop), size = Size(w, sillTop - grassTop))
 
-    val treeXs = listOf(w * 0.10f, w * 0.85f)
-    treeXs.forEach { tx ->
-        val trunkHeight = sillTop * 0.10f
+    val strokeColors = listOf(GrassStroke1, GrassStroke2, GrassStroke3)
+    val cols = 16
+    for (col in 0 until cols) {
+        val x = w * (col + 0.5f) / cols
+        val color = strokeColors[col % strokeColors.size]
+        val topY = grassTop + (sillTop - grassTop) * (0.15f + (col % 3) * 0.12f)
         drawLine(
-            color = TreeTrunk,
-            start = Offset(tx, grassTop),
-            end = Offset(tx, grassTop - trunkHeight),
-            strokeWidth = 3f,
+            color = color.copy(alpha = 0.6f),
+            start = Offset(x, sillTop),
+            end = Offset(x + (if (col % 2 == 0) 3f else -3f), topY),
+            strokeWidth = (sillTop - grassTop) * 0.10f,
             cap = StrokeCap.Round
         )
-        drawCircle(color = TreeFoliage, radius = sillTop * 0.075f, center = Offset(tx, grassTop - trunkHeight - sillTop * 0.03f))
+    }
+    drawLine(color = GrassOutline, start = Offset(0f, grassTop), end = Offset(w, grassTop), strokeWidth = 1.6f)
+
+    drawAlmondBranch(Offset(w * 0.08f, grassTop), sillTop * 0.62f, mirror = false)
+    drawAlmondBranch(Offset(w * 0.90f, grassTop), sillTop * 0.58f, mirror = true)
+}
+
+private fun DrawScope.drawAlmondBranch(origin: Offset, scale: Float, mirror: Boolean) {
+    val dir = if (mirror) -1f else 1f
+
+    val branchPath = Path().apply {
+        moveTo(origin.x, origin.y)
+        cubicTo(
+            origin.x + dir * scale * 0.12f, origin.y - scale * 0.32f,
+            origin.x + dir * scale * 0.04f, origin.y - scale * 0.55f,
+            origin.x + dir * scale * 0.24f, origin.y - scale * 0.82f
+        )
+    }
+    drawPath(branchPath, color = BranchColor, style = Stroke(width = scale * 0.05f, cap = StrokeCap.Round))
+
+    val twigPath = Path().apply {
+        moveTo(origin.x + dir * scale * 0.09f, origin.y - scale * 0.46f)
+        cubicTo(
+            origin.x + dir * scale * 0.27f, origin.y - scale * 0.5f,
+            origin.x + dir * scale * 0.34f, origin.y - scale * 0.64f,
+            origin.x + dir * scale * 0.44f, origin.y - scale * 0.72f
+        )
+    }
+    drawPath(twigPath, color = BranchColor, style = Stroke(width = scale * 0.032f, cap = StrokeCap.Round))
+
+    val blossomSpots = listOf(
+        Offset(origin.x + dir * scale * 0.24f, origin.y - scale * 0.82f),
+        Offset(origin.x + dir * scale * 0.13f, origin.y - scale * 0.52f),
+        Offset(origin.x + dir * scale * 0.44f, origin.y - scale * 0.72f),
+        Offset(origin.x + dir * scale * 0.02f, origin.y - scale * 0.28f),
+        Offset(origin.x + dir * scale * 0.30f, origin.y - scale * 0.60f)
+    )
+    blossomSpots.forEachIndexed { i, spot ->
+        val petal = if (i % 2 == 0) BlossomWhite else BlossomPink
+        val r = scale * 0.055f
+        drawCircle(color = petal, radius = r, center = Offset(spot.x - r * 0.6f, spot.y))
+        drawCircle(color = petal, radius = r, center = Offset(spot.x + r * 0.6f, spot.y - r * 0.3f))
+        drawCircle(color = petal.copy(alpha = 0.95f), radius = r * 0.9f, center = Offset(spot.x, spot.y + r * 0.7f))
+        drawCircle(color = BlossomCenter, radius = r * 0.28f, center = spot)
     }
 }
 
 private fun DrawScope.drawPondAndDucks(w: Float, sillTop: Float) {
     val pondCenter = Offset(w * 0.56f, sillTop * 0.86f)
     val pondSize = Size(w * 0.34f, sillTop * 0.16f)
+    val pondTopLeft = Offset(pondCenter.x - pondSize.width / 2, pondCenter.y - pondSize.height / 2)
 
-    drawOval(
-        color = PondBlue,
-        topLeft = Offset(pondCenter.x - pondSize.width / 2, pondCenter.y - pondSize.height / 2),
-        size = pondSize
+    drawOval(color = PondBlue, topLeft = pondTopLeft, size = pondSize)
+    drawOval(color = PondOutline, topLeft = pondTopLeft, size = pondSize, style = Stroke(width = 1.6f))
+
+    drawLine(
+        color = PondHighlight.copy(alpha = 0.7f),
+        start = Offset(pondTopLeft.x + pondSize.width * 0.2f, pondCenter.y - pondSize.height * 0.1f),
+        end = Offset(pondTopLeft.x + pondSize.width * 0.55f, pondCenter.y - pondSize.height * 0.05f),
+        strokeWidth = pondSize.height * 0.14f,
+        cap = StrokeCap.Round
     )
-    drawOval(
-        color = PondDeep.copy(alpha = 0.5f),
-        topLeft = Offset(pondCenter.x - pondSize.width * 0.3f, pondCenter.y - pondSize.height * 0.15f),
-        size = Size(pondSize.width * 0.6f, pondSize.height * 0.5f)
+    drawLine(
+        color = PondHighlight.copy(alpha = 0.5f),
+        start = Offset(pondTopLeft.x + pondSize.width * 0.35f, pondCenter.y + pondSize.height * 0.2f),
+        end = Offset(pondTopLeft.x + pondSize.width * 0.75f, pondCenter.y + pondSize.height * 0.22f),
+        strokeWidth = pondSize.height * 0.1f,
+        cap = StrokeCap.Round
     )
 
     drawDuck(Offset(pondCenter.x - pondSize.width * 0.18f, pondCenter.y - pondSize.height * 0.05f), pondSize.height * 0.85f)
@@ -133,15 +239,14 @@ private fun DrawScope.drawPondAndDucks(w: Float, sillTop: Float) {
 private fun DrawScope.drawDuck(center: Offset, scale: Float) {
     val bodyWidth = scale * 1.6f
     val bodyHeight = scale * 0.85f
+    val bodyTopLeft = Offset(center.x - bodyWidth / 2, center.y - bodyHeight / 2)
 
-    drawOval(
-        color = DuckBody,
-        topLeft = Offset(center.x - bodyWidth / 2, center.y - bodyHeight / 2),
-        size = Size(bodyWidth, bodyHeight)
-    )
+    drawOval(color = DuckBody, topLeft = bodyTopLeft, size = Size(bodyWidth, bodyHeight))
+    drawOval(color = DuckOutline, topLeft = bodyTopLeft, size = Size(bodyWidth, bodyHeight), style = Stroke(width = 1.1f))
 
     val headCenter = Offset(center.x + bodyWidth * 0.32f, center.y - bodyHeight * 0.55f)
     drawCircle(color = DuckBody, radius = scale * 0.4f, center = headCenter)
+    drawCircle(color = DuckOutline, radius = scale * 0.4f, center = headCenter, style = Stroke(width = 1f))
 
     val beakPath = Path().apply {
         moveTo(headCenter.x + scale * 0.32f, headCenter.y)
@@ -150,58 +255,46 @@ private fun DrawScope.drawDuck(center: Offset, scale: Float) {
         close()
     }
     drawPath(beakPath, color = DuckBeak)
-
     drawCircle(color = Color.Black, radius = scale * 0.06f, center = Offset(headCenter.x + scale * 0.1f, headCenter.y - scale * 0.08f))
 }
 
 private fun DrawScope.drawWindowFrame(w: Float, sillTop: Float) {
     val frameThickness = w * 0.02f
     val halfFrame = frameThickness / 2f
+    val outlineExtra = frameThickness * 0.7f
 
-    // outer frame border, inset by half its stroke width so the full
-    // thickness renders within the canvas instead of being clipped at the edge
-    drawRect(
-        color = WindowFrame,
-        topLeft = Offset(halfFrame, halfFrame),
-        size = Size(w - frameThickness, sillTop - frameThickness),
-        style = Stroke(width = frameThickness)
-    )
+    // Outline and fill share the same centerline; the wider outline stroke
+    // peeks out on both sides of the narrower fill stroke drawn on top of it,
+    // giving a bordered look instead of being fully covered.
+    val frameTopLeft = Offset(halfFrame, halfFrame)
+    val frameSize = Size(w - frameThickness, sillTop - frameThickness)
+    drawRect(color = WindowOutline, topLeft = frameTopLeft, size = frameSize, style = Stroke(width = frameThickness + outlineExtra))
+    drawRect(color = WindowFrame, topLeft = frameTopLeft, size = frameSize, style = Stroke(width = frameThickness))
 
-    // mullions (cross bars dividing the glass into four panes)
-    drawLine(
-        color = WindowFrame,
-        start = Offset(w / 2f, frameThickness / 2),
-        end = Offset(w / 2f, sillTop - frameThickness / 2),
-        strokeWidth = frameThickness * 0.8f
-    )
-    drawLine(
-        color = WindowFrame,
-        start = Offset(frameThickness / 2, sillTop / 2f),
-        end = Offset(w - frameThickness / 2, sillTop / 2f),
-        strokeWidth = frameThickness * 0.8f
-    )
+    val mullionV = Offset(w / 2f, frameThickness / 2) to Offset(w / 2f, sillTop - frameThickness / 2)
+    drawLine(color = WindowOutline, start = mullionV.first, end = mullionV.second, strokeWidth = frameThickness * 0.75f + outlineExtra)
+    drawLine(color = WindowFrame, start = mullionV.first, end = mullionV.second, strokeWidth = frameThickness * 0.75f)
 
-    // subtle inner shadow for depth right where the frame meets the glass
-    drawRect(
-        color = WindowFrameShadow,
-        topLeft = Offset(frameThickness, frameThickness),
-        size = Size(w - frameThickness * 2, sillTop - frameThickness * 2),
-        style = Stroke(width = frameThickness * 0.35f)
-    )
+    val mullionH = Offset(frameThickness / 2, sillTop / 2f) to Offset(w - frameThickness / 2, sillTop / 2f)
+    drawLine(color = WindowOutline, start = mullionH.first, end = mullionH.second, strokeWidth = frameThickness * 0.75f + outlineExtra)
+    drawLine(color = WindowFrame, start = mullionH.first, end = mullionH.second, strokeWidth = frameThickness * 0.75f)
 }
 
 private fun DrawScope.drawSill(w: Float, h: Float, sillTop: Float) {
-    drawRect(
-        color = SillWood,
-        topLeft = Offset(0f, sillTop),
-        size = Size(w, h - sillTop)
-    )
-    drawLine(
-        color = SillWoodHighlight,
-        start = Offset(0f, sillTop + 2f),
-        end = Offset(w, sillTop + 2f),
-        strokeWidth = 3f
-    )
+    drawRect(color = SillWood, topLeft = Offset(0f, sillTop), size = Size(w, h - sillTop))
+
+    val grainColors = listOf(SillGrainDark, SillGrainLight)
+    val lines = 5
+    for (i in 0 until lines) {
+        val y = sillTop + (h - sillTop) * (i + 1f) / (lines + 1f)
+        drawLine(
+            color = grainColors[i % grainColors.size].copy(alpha = 0.4f),
+            start = Offset(w * 0.02f, y),
+            end = Offset(w * 0.98f, y + (if (i % 2 == 0) 2f else -2f)),
+            strokeWidth = 1.4f
+        )
+    }
+    drawLine(color = SillGrainLight, start = Offset(0f, sillTop + 2f), end = Offset(w, sillTop + 2f), strokeWidth = 3f)
 }
 
 private fun DrawScope.drawHerbPots(w: Float, h: Float, sillTop: Float) {
@@ -212,7 +305,7 @@ private fun DrawScope.drawHerbPots(w: Float, h: Float, sillTop: Float) {
 
     for (i in 0 until potCount) {
         val cx = w * (i + 0.5f) / potCount
-        val leafColor = if (i % 2 == 0) LeafGreen else LeafGreenLight
+        val leafColor = if (i % 2 == 0) LeafSage else LeafOlive
         drawHerbPot(cx, baseY, potWidth, potHeight, leafColor)
     }
 }
@@ -228,8 +321,9 @@ private fun DrawScope.drawHerbPot(baseX: Float, baseY: Float, potWidth: Float, p
         close()
     }
     drawPath(potPath, color = PotColor)
+    drawPath(potPath, color = PotOutline, style = Stroke(width = potWidth * 0.06f))
     drawLine(
-        color = PotRim,
+        color = PotOutline,
         start = Offset(baseX - potWidth * 0.5f, potTopY),
         end = Offset(baseX + potWidth * 0.5f, potTopY),
         strokeWidth = potWidth * 0.12f
@@ -237,19 +331,20 @@ private fun DrawScope.drawHerbPot(baseX: Float, baseY: Float, potWidth: Float, p
 
     val sprigAngles = listOf(-55f, -20f, 15f, 50f)
     val sprigLength = potHeight * 0.9f
-    sprigAngles.forEach { angleDeg ->
+    sprigAngles.forEachIndexed { idx, angleDeg ->
         val rad = Math.toRadians((angleDeg - 90f).toDouble())
         val tip = Offset(
             baseX + (cos(rad) * sprigLength).toFloat(),
             potTopY + (sin(rad) * sprigLength).toFloat()
         )
+        val strokeColor = if (idx % 2 == 0) leafColor else leafColor.copy(alpha = 0.85f)
         drawLine(
-            color = leafColor,
+            color = strokeColor,
             start = Offset(baseX, potTopY),
             end = tip,
-            strokeWidth = potWidth * 0.09f,
+            strokeWidth = potWidth * 0.1f,
             cap = StrokeCap.Round
         )
-        drawCircle(color = leafColor, radius = potWidth * 0.16f, center = tip)
+        drawCircle(color = strokeColor, radius = potWidth * 0.17f, center = tip)
     }
 }
