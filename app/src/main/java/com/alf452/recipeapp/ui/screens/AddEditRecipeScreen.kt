@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.util.createRecipePhotoUri
+import com.alf452.recipeapp.util.deletePhotoUri
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,8 +72,18 @@ fun AddEditRecipeScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            photoUri = pendingCameraUri?.toString()
+        val newUri = pendingCameraUri
+        if (success && newUri != null) {
+            // Only delete the photo currently shown if it's an unsaved capture from
+            // *this* editing session — never the original persisted photo, since the
+            // user might still back out of this screen without saving.
+            val current = photoUri
+            if (current != null && current != existingRecipe?.photoUri) {
+                deletePhotoUri(context, current)
+            }
+            photoUri = newUri.toString()
+        } else if (newUri != null) {
+            deletePhotoUri(context, newUri.toString())
         }
     }
 
@@ -109,6 +120,10 @@ fun AddEditRecipeScreen(
                     IconButton(
                         onClick = {
                             if (title.isNotBlank()) {
+                                val originalPhotoUri = existingRecipe?.photoUri
+                                if (originalPhotoUri != null && originalPhotoUri != photoUri) {
+                                    deletePhotoUri(context, originalPhotoUri)
+                                }
                                 onSave(
                                     Recipe(
                                         id = id,

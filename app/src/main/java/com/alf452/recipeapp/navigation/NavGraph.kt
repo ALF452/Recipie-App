@@ -3,6 +3,7 @@ package com.alf452.recipeapp.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -34,7 +35,7 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
 
     val pendingSharedText by viewModel.pendingSharedText
     LaunchedEffect(pendingSharedText) {
-        if (pendingSharedText != null) {
+        if (pendingSharedText != null && navController.currentDestination?.route != Routes.IMPORT) {
             navController.navigate(Routes.IMPORT)
         }
     }
@@ -104,14 +105,16 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
         }
 
         composable(Routes.IMPORT) {
+            // Captured once on entry (not tied to a specific exit path) so the text
+            // doesn't linger and reappear if this screen is dismissed via the
+            // system back gesture instead of the in-app back button.
+            val capturedSharedText = remember { pendingSharedText }
+            LaunchedEffect(Unit) { viewModel.consumePendingSharedText() }
+
             ImportRecipeScreen(
-                initialSharedText = pendingSharedText,
-                onBack = {
-                    viewModel.consumePendingSharedText()
-                    navController.popBackStack()
-                },
+                initialSharedText = capturedSharedText,
+                onBack = { navController.popBackStack() },
                 onImport = { recipe ->
-                    viewModel.consumePendingSharedText()
                     viewModel.saveRecipe(recipe) { newId ->
                         navController.navigate(Routes.detail(newId)) {
                             popUpTo(Routes.LIST)

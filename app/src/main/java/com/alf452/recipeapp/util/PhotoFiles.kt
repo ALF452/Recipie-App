@@ -15,3 +15,12 @@ fun createRecipePhotoUri(context: Context): Uri {
     val photoFile = File(photosDir, "recipe_${System.currentTimeMillis()}.jpg")
     return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", photoFile)
 }
+
+/**
+ * Deletes a previously created recipe photo (an old photo replaced by a retake,
+ * or an unused destination file left behind by a cancelled camera capture), so
+ * private storage doesn't accumulate orphaned files over time.
+ */
+fun deletePhotoUri(context: Context, uriString: String) {
+    runCatching { context.contentResolver.delete(Uri.parse(uriString), null, null) }
+}

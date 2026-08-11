@@ -52,6 +52,7 @@ import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.util.buildShareText
 import com.alf452.recipeapp.util.createRecipePhotoUri
+import com.alf452.recipeapp.util.deletePhotoUri
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,10 +76,12 @@ fun RecipeDetailScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            pendingCameraUri?.let { uri ->
-                onPhotoUpdated(current.copy(photoUri = uri.toString()))
-            }
+        val newUri = pendingCameraUri
+        if (success && newUri != null) {
+            current.photoUri?.let { old -> deletePhotoUri(context, old) }
+            onPhotoUpdated(current.copy(photoUri = newUri.toString()))
+        } else if (newUri != null) {
+            deletePhotoUri(context, newUri.toString())
         }
     }
 
