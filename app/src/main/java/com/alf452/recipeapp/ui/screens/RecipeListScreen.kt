@@ -166,8 +166,8 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = RecipeCream),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color.Black),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -176,7 +176,7 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
             RecipeThumbnail(photoUri = recipe.photoUri)
 
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium)
+                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium, color = Color.Black)
                 if (recipe.category.isNotBlank()) {
                     Text(
                         text = recipe.category,
@@ -187,6 +187,7 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
                 Text(
                     text = recipe.ingredients,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
