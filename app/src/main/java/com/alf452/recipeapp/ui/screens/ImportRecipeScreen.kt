@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.data.toRecipe
+import com.alf452.recipeapp.ui.components.OutlinedText
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.ui.components.darkTextFieldColors
 import com.alf452.recipeapp.util.decodeSharedRecipe
@@ -69,11 +70,10 @@ fun ImportRecipeScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                Text(
+                OutlinedText(
                     text = "Got a recipe from another My Cookbook user? Paste the message they sent you below, " +
                         "or share it into the app directly from your messaging or email app.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 OutlinedTextField(

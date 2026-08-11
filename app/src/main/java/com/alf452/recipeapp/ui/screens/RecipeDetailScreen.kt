@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.OutlinedText
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.util.buildShareText
 import com.alf452.recipeapp.util.createRecipePhotoUri
@@ -157,10 +158,9 @@ fun RecipeDetailScreen(
                     Text(current.category, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
                 }
 
-                Text(
-                    "Ingredients",
+                OutlinedText(
+                    text = "Ingredients",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black,
                     modifier = Modifier.padding(top = 16.dp)
                 )
 
@@ -169,10 +169,9 @@ fun RecipeDetailScreen(
                 }
 
                 if (ingredientLines.isEmpty()) {
-                    Text(
-                        current.ingredients,
+                    OutlinedText(
+                        text = current.ingredients,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 } else {
@@ -186,21 +185,19 @@ fun RecipeDetailScreen(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-                Text("Instructions", style = MaterialTheme.typography.titleMedium, color = Color.Black)
-                Text(
-                    current.instructions,
+                OutlinedText(text = "Instructions", style = MaterialTheme.typography.titleMedium)
+                OutlinedText(
+                    text = current.instructions,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
                 if (current.notes.isNotBlank()) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-                    Text("Notes", style = MaterialTheme.typography.titleMedium, color = Color.Black)
-                    Text(
-                        current.notes,
+                    OutlinedText(text = "Notes", style = MaterialTheme.typography.titleMedium)
+                    OutlinedText(
+                        text = current.notes,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

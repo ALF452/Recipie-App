@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.OutlinedText
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.ui.components.darkTextFieldColors
 import com.alf452.recipeapp.util.createRecipePhotoUri
@@ -204,10 +205,9 @@ fun AddEditRecipeScreen(
                     minLines = 2,
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
                 )
-                Text(
+                OutlinedText(
                     text = "Title is required to save.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }

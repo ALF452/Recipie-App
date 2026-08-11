@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.ui.components.MarbleCountertopBackground
+import com.alf452.recipeapp.ui.components.OutlinedText
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.ui.theme.RecipeBrownDark
 import com.alf452.recipeapp.ui.theme.RecipeCream
@@ -176,7 +177,7 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
             RecipeThumbnail(photoUri = recipe.photoUri)
 
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                OutlinedText(text = recipe.title, style = MaterialTheme.typography.titleMedium)
                 if (recipe.category.isNotBlank()) {
                     Text(
                         text = recipe.category,
@@ -184,10 +185,9 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
-                Text(
+                OutlinedText(
                     text = recipe.ingredients,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)

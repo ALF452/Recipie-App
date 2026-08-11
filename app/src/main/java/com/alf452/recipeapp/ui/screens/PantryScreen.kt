@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.PantryItem
+import com.alf452.recipeapp.ui.components.OutlinedText
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.ui.components.darkTextFieldColors
 import kotlinx.coroutines.flow.Flow
@@ -85,10 +86,9 @@ fun PantryScreen(
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                Text(
+                OutlinedText(
                     text = "Add the food, spices, and herbs you have on hand. Recipe ingredients will be highlighted green when you already have them, red when you don't.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -115,10 +115,9 @@ fun PantryScreen(
 
                 if (pantryItems.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
+                        OutlinedText(
                             text = "Your pantry is empty.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 } else {
@@ -130,10 +129,9 @@ fun PantryScreen(
                                     .padding(vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
+                                OutlinedText(
                                     text = item.name,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.Black,
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(onClick = { onDeleteItem(item) }) {
