@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.printToLog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -43,9 +44,14 @@ class TimesMadeSurvivesEditTest {
         // increment broke instead of only "somewhere in these three taps".
         composeRule.onNodeWithText("Chili").performClick()
         composeRule.waitForIdle()
+        // Diagnostic: dump the FAB's actual semantics/text to the test's
+        // stdout before asserting, since assertTextContains's failure
+        // message doesn't include the node's actual text value.
+        composeRule.onNodeWithTag("times_made_fab").printToLog("FAB_DEBUG_initial")
         for (expected in 1..3) {
             composeRule.onNodeWithTag("times_made_fab").performClick()
             composeRule.waitForIdle()
+            composeRule.onNodeWithTag("times_made_fab").printToLog("FAB_DEBUG_after_tap_$expected")
             composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it ${expected}×", substring = true)
         }
 
