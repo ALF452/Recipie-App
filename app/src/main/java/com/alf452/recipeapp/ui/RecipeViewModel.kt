@@ -3,6 +3,8 @@ package com.alf452.recipeapp.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.alf452.recipeapp.data.PantryItem
+import com.alf452.recipeapp.data.PantryRepository
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.data.RecipeDatabase
 import com.alf452.recipeapp.data.RecipeRepository
@@ -11,11 +13,12 @@ import kotlinx.coroutines.launch
 
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: RecipeRepository = RecipeRepository(
-        RecipeDatabase.getInstance(application).recipeDao()
-    )
+    private val database = RecipeDatabase.getInstance(application)
+    private val repository: RecipeRepository = RecipeRepository(database.recipeDao())
+    private val pantryRepository: PantryRepository = PantryRepository(database.pantryDao())
 
     val allRecipes: Flow<List<Recipe>> = repository.allRecipes
+    val allPantryItems: Flow<List<PantryItem>> = pantryRepository.allItems
 
     fun getRecipeById(id: Long): Flow<Recipe?> = repository.getRecipeById(id)
 
@@ -35,6 +38,20 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteRecipe(recipe: Recipe) {
         viewModelScope.launch {
             repository.deleteRecipe(recipe)
+        }
+    }
+
+    fun addPantryItem(name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        viewModelScope.launch {
+            pantryRepository.addItem(trimmed)
+        }
+    }
+
+    fun deletePantryItem(item: PantryItem) {
+        viewModelScope.launch {
+            pantryRepository.deleteItem(item)
         }
     }
 }

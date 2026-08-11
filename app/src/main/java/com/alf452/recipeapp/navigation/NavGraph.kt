@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.alf452.recipeapp.ui.RecipeViewModel
 import com.alf452.recipeapp.ui.screens.AddEditRecipeScreen
+import com.alf452.recipeapp.ui.screens.PantryScreen
 import com.alf452.recipeapp.ui.screens.RecipeDetailScreen
 import com.alf452.recipeapp.ui.screens.RecipeListScreen
 
@@ -17,6 +18,7 @@ private object Routes {
     const val DETAIL = "recipe_detail/{recipeId}"
     const val ADD = "recipe_add"
     const val EDIT = "recipe_edit/{recipeId}"
+    const val PANTRY = "pantry"
 
     fun detail(id: Long) = "recipe_detail/$id"
     fun edit(id: Long) = "recipe_edit/$id"
@@ -31,7 +33,8 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
             RecipeListScreen(
                 recipesFlow = viewModel.allRecipes,
                 onAddClick = { navController.navigate(Routes.ADD) },
-                onRecipeClick = { id -> navController.navigate(Routes.detail(id)) }
+                onRecipeClick = { id -> navController.navigate(Routes.detail(id)) },
+                onPantryClick = { navController.navigate(Routes.PANTRY) }
             )
         }
 
@@ -42,6 +45,7 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
             val recipeId = backStackEntry.arguments?.getLong("recipeId") ?: 0L
             RecipeDetailScreen(
                 recipeFlow = viewModel.getRecipeById(recipeId),
+                pantryItemsFlow = viewModel.allPantryItems,
                 onBack = { navController.popBackStack() },
                 onEdit = { id -> navController.navigate(Routes.edit(id)) },
                 onDelete = { recipe ->
@@ -74,6 +78,15 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
                     viewModel.updateRecipe(recipe)
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable(Routes.PANTRY) {
+            PantryScreen(
+                pantryItemsFlow = viewModel.allPantryItems,
+                onBack = { navController.popBackStack() },
+                onAddItem = { name -> viewModel.addPantryItem(name) },
+                onDeleteItem = { item -> viewModel.deletePantryItem(item) }
             )
         }
     }

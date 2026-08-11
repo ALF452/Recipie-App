@@ -11,12 +11,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,7 +41,8 @@ import com.alf452.recipeapp.ui.theme.RecipeCream
 fun RecipeListScreen(
     recipesFlow: kotlinx.coroutines.flow.Flow<List<Recipe>>,
     onAddClick: () -> Unit,
-    onRecipeClick: (Long) -> Unit
+    onRecipeClick: (Long) -> Unit,
+    onPantryClick: () -> Unit
 ) {
     val recipes by recipesFlow.collectAsState(initial = emptyList())
 
@@ -54,7 +57,16 @@ fun RecipeListScreen(
                     colors = TopAppBarDefaults.largeTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    ),
+                    actions = {
+                        IconButton(onClick = onPantryClick) {
+                            Icon(
+                                Icons.Filled.Kitchen,
+                                contentDescription = "My Pantry",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
                 )
             },
             floatingActionButton = {
