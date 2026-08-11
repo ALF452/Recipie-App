@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Simple fork-and-spoon style mark on transparent background -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M36,30 L36,54 M32,30 L32,42 A4,4 0 0 0 36,46 L36,46 A4,4 0 0 0 40,42 L40,30 M36,54 L36,82" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M32,30 L32,42 A4,4 0 0 0 36,46 A4,4 0 0 0 40,42 L40,30 M36,46 L36,82" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M68,30 C76,30 78,38 74,46 C71,51 68,53 68,58 L68,82" />
+</vector>
