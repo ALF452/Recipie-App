@@ -23,6 +23,8 @@ private val VeinPrimary = Color(0xFF827C71)
 private val VeinSecondary = Color(0xFFA39D91)
 private val VeinFine = Color(0xFFBDB8AC)
 private val VeinWarm = Color(0xFF9C8863)
+private val CounterEdgeHighlight = Color(0xFFFFFFFF)
+private val CounterEdgeShadow = Color(0xFF000000)
 
 /**
  * A white marble countertop behind the main menu's top app bar, paired with
@@ -83,6 +85,43 @@ private fun DrawScope.drawMarble() {
     )
 
     veins.forEach { drawCrack(w, h, it.points, it.color, it.alpha, it.strokeWidth) }
+
+    drawCounterEdge(w, h)
+}
+
+// A bullnose highlight where the slab's rounded front edge catches the light,
+// followed by an AO contact shadow and a crisp seam line, so the marble reads
+// as a slab with real thickness overhanging the cutting board beneath it.
+private fun DrawScope.drawCounterEdge(w: Float, h: Float) {
+    val highlightHeight = (h * 0.035f).coerceAtMost(10f)
+    val shadowHeight = (h * 0.09f).coerceAtMost(26f)
+    val highlightTop = h - shadowHeight - highlightHeight
+
+    drawRect(
+        brush = Brush.verticalGradient(
+            colors = listOf(Color.Transparent, CounterEdgeHighlight.copy(alpha = 0.40f), Color.Transparent),
+            startY = highlightTop,
+            endY = highlightTop + highlightHeight
+        ),
+        topLeft = Offset(0f, highlightTop),
+        size = Size(w, highlightHeight)
+    )
+
+    drawRect(
+        brush = Brush.verticalGradient(
+            colors = listOf(Color.Transparent, CounterEdgeShadow.copy(alpha = 0.34f)),
+            startY = h - shadowHeight,
+            endY = h
+        ),
+        topLeft = Offset(0f, h - shadowHeight),
+        size = Size(w, shadowHeight)
+    )
+
+    drawRect(
+        color = CounterEdgeShadow.copy(alpha = 0.45f),
+        topLeft = Offset(0f, h - 1.5f),
+        size = Size(w, 1.5f)
+    )
 }
 
 private fun DrawScope.drawMottling(w: Float, h: Float) {
