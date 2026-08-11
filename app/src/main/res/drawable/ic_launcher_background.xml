@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Warm wooden tabletop the book rests on, echoing the app's own cutting-board motif -->
+<!-- Sage-painted wooden tabletop the book rests on -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
@@ -15,15 +15,15 @@
                 android:startY="0"
                 android:endX="98"
                 android:endY="108"
-                android:startColor="#A5754A"
-                android:endColor="#7C4F2B" />
+                android:startColor="#B3C4A0"
+                android:endColor="#8AA075" />
         </aapt:attr>
     </path>
 
     <!-- faint plank seams -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#5C3A1E"
+        android:strokeColor="#5B6E4C"
         android:strokeAlpha="0.30"
         android:strokeWidth="1.4"
         android:pathData="M18,0 L14,108 M56,0 L54,108 M94,0 L98,108" />
@@ -31,27 +31,27 @@
     <!-- soft wood grain waves -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#4A2E17"
+        android:strokeColor="#48583C"
         android:strokeAlpha="0.16"
         android:strokeWidth="1"
         android:strokeLineCap="round"
         android:pathData="M0,24 Q20,20 38,25 T76,23 T108,26" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#4A2E17"
+        android:strokeColor="#48583C"
         android:strokeAlpha="0.14"
         android:strokeWidth="1"
         android:strokeLineCap="round"
         android:pathData="M0,60 Q22,56 42,61 T80,59 T108,62" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#C99A5B"
-        android:strokeAlpha="0.14"
+        android:strokeColor="#D6E2C4"
+        android:strokeAlpha="0.18"
         android:strokeWidth="1"
         android:strokeLineCap="round"
         android:pathData="M0,88 Q24,84 44,89 T82,87 T108,90" />
 
     <!-- gentle vignette so the corners read as the same tabletop the book sits on -->
-    <path android:fillColor="#2E1B0E" android:fillAlpha="0.16" android:pathData="M0,0 L108,0 L108,14 L0,14 Z" />
-    <path android:fillColor="#2E1B0E" android:fillAlpha="0.20" android:pathData="M0,96 L108,96 L108,108 L0,108 Z" />
+    <path android:fillColor="#20291A" android:fillAlpha="0.16" android:pathData="M0,0 L108,0 L108,14 L0,14 Z" />
+    <path android:fillColor="#20291A" android:fillAlpha="0.20" android:pathData="M0,96 L108,96 L108,108 L0,108 Z" />
 </vector>

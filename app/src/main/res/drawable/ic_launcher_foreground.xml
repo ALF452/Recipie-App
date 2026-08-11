@@ -7,16 +7,15 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- contact shadow the book casts on the table (book's scaled bottom edge sits at y≈83) -->
-    <path android:fillColor="#000000" android:fillAlpha="0.28" android:pathData="M29,84 A25,4.5 0 1,0 79,84 A25,4.5 0 1,0 29,84 Z" />
+    <!-- contact shadow the book casts on the table (book's scaled bottom edge sits at y≈79) -->
+    <path android:fillColor="#000000" android:fillAlpha="0.28" android:pathData="M29,80 A25,4.5 0 1,0 79,80 A25,4.5 0 1,0 29,80 Z" />
 
-    <!-- book, scaled down and recentered so more of the table shows around it -->
+    <!-- book, scaled down and precisely centered on the viewport (54,54) so it's not off-center -->
     <group
         android:scaleX="0.62"
         android:scaleY="0.62"
         android:pivotX="54"
-        android:pivotY="54"
-        android:translateY="4">
+        android:pivotY="54">
 
         <!-- front cover, gradient for a curved, less-flat look -->
         <path android:pathData="M24,14 L84,14 A6,6 0 0 1 90,20 L90,88 A6,6 0 0 1 84,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z">
