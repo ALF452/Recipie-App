@@ -38,6 +38,7 @@ fun ImportRecipeScreen(
 ) {
     var rawText by remember { mutableStateOf(initialSharedText.orEmpty()) }
     val parsed = remember(rawText) { decodeSharedRecipe(rawText) }
+    var isImporting by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -101,10 +102,16 @@ fun ImportRecipeScreen(
                     }
 
                     Button(
-                        onClick = { onImport(parsed.toRecipe()) },
+                        onClick = {
+                            if (!isImporting) {
+                                isImporting = true
+                                onImport(parsed.toRecipe())
+                            }
+                        },
+                        enabled = !isImporting,
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                     ) {
-                        Text("Save to My Cookbook")
+                        Text(if (isImporting) "Saving…" else "Save to My Cookbook")
                     }
                 } else {
                     Text(

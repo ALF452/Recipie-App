@@ -156,12 +156,14 @@ private fun DrawScope.drawDuck(center: Offset, scale: Float) {
 
 private fun DrawScope.drawWindowFrame(w: Float, sillTop: Float) {
     val frameThickness = w * 0.02f
+    val halfFrame = frameThickness / 2f
 
-    // outer frame border
+    // outer frame border, inset by half its stroke width so the full
+    // thickness renders within the canvas instead of being clipped at the edge
     drawRect(
         color = WindowFrame,
-        topLeft = Offset.Zero,
-        size = Size(w, sillTop),
+        topLeft = Offset(halfFrame, halfFrame),
+        size = Size(w - frameThickness, sillTop - frameThickness),
         style = Stroke(width = frameThickness)
     )
 
