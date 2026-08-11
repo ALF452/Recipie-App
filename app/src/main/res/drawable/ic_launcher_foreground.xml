@@ -1,21 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Old leatherbound book: cover, spine, gilt-tooled border, and a strap latch with buckle -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Simple fork-and-spoon style mark on transparent background -->
+
+    <!-- front cover -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M36,30 L36,54 M32,30 L32,42 A4,4 0 0 0 36,46 L36,46 A4,4 0 0 0 40,42 L40,30 M36,54 L36,82" />
+        android:fillColor="#5A3A22"
+        android:pathData="M24,14 L84,14 A6,6 0 0 1 90,20 L90,88 A6,6 0 0 1 84,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z" />
+
+    <!-- spine, darker leather at the binding edge -->
+    <path
+        android:fillColor="#3E2716"
+        android:pathData="M24,14 L30,14 L30,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z" />
+
+    <!-- soft top-left leather highlight -->
+    <path
+        android:fillColor="#6E4A2C"
+        android:fillAlpha="0.55"
+        android:pathData="M32,16 L82,16 A4,4 0 0 1 86,20 L86,26 L32,26 Z" />
+
+    <!-- gilt tooled border -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="4"
-        android:pathData="M32,30 L32,42 A4,4 0 0 0 36,46 A4,4 0 0 0 40,42 L40,30 M36,46 L36,82" />
+        android:strokeColor="#C9A227"
+        android:strokeAlpha="0.85"
+        android:strokeWidth="1.4"
+        android:pathData="M28,20 L80,20 A4,4 0 0 1 84,24 L84,84 A4,4 0 0 1 80,88 L28,88 A4,4 0 0 1 24,84 L24,24 A4,4 0 0 1 28,20 Z" />
+
+    <!-- leather strap holding the book shut -->
+    <path
+        android:fillColor="#43290F"
+        android:pathData="M57,14 L69,14 L69,94 L57,94 Z" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="4"
-        android:pathData="M68,30 C76,30 78,38 74,46 C71,51 68,53 68,58 L68,82" />
+        android:strokeColor="#2E1A0A"
+        android:strokeWidth="1"
+        android:pathData="M57,14 L57,94 M69,14 L69,94" />
+
+    <!-- brass buckle -->
+    <path
+        android:fillColor="#C9A227"
+        android:pathData="M63,45 A9,9 0 1,0 63.01,45 Z" />
+    <path
+        android:fillColor="#5A3A22"
+        android:pathData="M63,45 A4.2,4.2 0 1,0 63.01,45 Z" />
+    <path
+        android:fillColor="#8C6A1E"
+        android:pathData="M55,44 L71,44 L71,47 L55,47 Z" />
+
+    <!-- strap tongue below the buckle -->
+    <path
+        android:fillColor="#3A2210"
+        android:pathData="M60,54 L66,54 L66,68 L63,72 L60,68 Z" />
 </vector>

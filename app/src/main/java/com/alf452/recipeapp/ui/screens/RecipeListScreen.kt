@@ -50,7 +50,7 @@ fun RecipeListScreen(
             containerColor = Color.Transparent,
             topBar = {
                 LargeTopAppBar(
-                    title = { Text("Recipe Box") },
+                    title = { Text("My Cookbook") },
                     colors = TopAppBarDefaults.largeTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary

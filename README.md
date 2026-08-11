@@ -1,4 +1,4 @@
-# Recipe Box
+# My Cookbook
 
 A simple Android app for saving your own cooking recipes, built with Kotlin, Jetpack Compose, and Room (local on-device storage — no account or internet needed).
 

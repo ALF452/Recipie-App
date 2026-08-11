@@ -34,16 +34,16 @@ jobs:
       - name: Upload APK as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: recipe-box-debug-apk
+          name: my-cookbook-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Publish APK to demo release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: demo-apk
-          name: "Recipe Box - Demo APK"
+          name: "My Cookbook - Demo APK"
           body: |
-            Auto-built debug APK of Recipe Box from the latest push to `claude/android-recipe-app-0is30s`.
+            Auto-built debug APK of My Cookbook from the latest push to `claude/android-recipe-app-0is30s`.
 
             **To install:** download `app-debug.apk` to your Android phone (Android 8.0+), open it, and allow installs from unknown sources when prompted.
 
