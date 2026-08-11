@@ -28,6 +28,16 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Run unit tests (100-recipe/pantry/photo stress test)
+        run: ./gradlew testReleaseUnitTest --stacktrace
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: app/build/reports/tests/testReleaseUnitTest/
+
       - name: Build minified, resource-shrunk release APK
         run: ./gradlew assembleRelease --stacktrace
 
