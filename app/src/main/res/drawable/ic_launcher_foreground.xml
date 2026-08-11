@@ -1,42 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Old leatherbound book: cover, spine, gilt-tooled border, and a strap latch with buckle -->
+<!-- Old leatherbound book, red leather: cover, spine, gilt-tooled border, and a strap latch with buckle -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- front cover -->
-    <path
-        android:fillColor="#5A3A22"
-        android:pathData="M24,14 L84,14 A6,6 0 0 1 90,20 L90,88 A6,6 0 0 1 84,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z" />
+    <!-- front cover, gradient for a curved, less-flat look -->
+    <path android:pathData="M24,14 L84,14 A6,6 0 0 1 90,20 L90,88 A6,6 0 0 1 84,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="20"
+                android:startY="16"
+                android:endX="88"
+                android:endY="92"
+                android:startColor="#D6453D"
+                android:endColor="#8E1F1F" />
+        </aapt:attr>
+    </path>
 
-    <!-- spine, darker leather at the binding edge -->
+    <!-- spine, darker red leather at the binding edge -->
     <path
-        android:fillColor="#3E2716"
+        android:fillColor="#6E1414"
         android:pathData="M24,14 L30,14 L30,94 L24,94 A6,6 0 0 1 18,88 L18,20 A6,6 0 0 1 24,14 Z" />
 
-    <!-- soft top-left leather highlight -->
+    <!-- leather grain: worn mottling patches -->
+    <path android:fillColor="#4A1010" android:fillAlpha="0.20" android:pathData="M27,32 A5,5 0 1,0 37,32 A5,5 0 1,0 27,32 Z" />
+    <path android:fillColor="#4A1010" android:fillAlpha="0.16" android:pathData="M66,48 A6,6 0 1,0 78,48 A6,6 0 1,0 66,48 Z" />
+    <path android:fillColor="#4A1010" android:fillAlpha="0.18" android:pathData="M37,72 A5,5 0 1,0 47,72 A5,5 0 1,0 37,72 Z" />
+    <path android:fillColor="#4A1010" android:fillAlpha="0.15" android:pathData="M66,78 A4,4 0 1,0 74,78 A4,4 0 1,0 66,78 Z" />
+    <path android:fillColor="#4A1010" android:fillAlpha="0.12" android:pathData="M46,50 A7,7 0 1,0 60,50 A7,7 0 1,0 46,50 Z" />
+
+    <!-- leather grain: fine hairline creases -->
     <path
-        android:fillColor="#6E4A2C"
-        android:fillAlpha="0.55"
-        android:pathData="M32,16 L82,16 A4,4 0 0 1 86,20 L86,26 L32,26 Z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#5C1010"
+        android:strokeAlpha="0.35"
+        android:strokeWidth="0.9"
+        android:strokeLineCap="round"
+        android:pathData="M34,24 L40,27 M50,20 L58,24 M74,26 L80,23 M38,40 L46,44 M60,38 L68,42 M32,58 L40,55 M52,62 L60,58 M70,66 L78,70 M36,80 L44,84 M58,84 L66,80 M28,66 L34,69 M76,52 L82,55" />
+
+    <!-- soft diagonal sheen suggesting curvature -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.14"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:pathData="M30,22 L52,70" />
 
     <!-- gilt tooled border -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#C9A227"
-        android:strokeAlpha="0.85"
+        android:strokeAlpha="0.9"
         android:strokeWidth="1.4"
         android:pathData="M28,20 L80,20 A4,4 0 0 1 84,24 L84,84 A4,4 0 0 1 80,88 L28,88 A4,4 0 0 1 24,84 L24,24 A4,4 0 0 1 28,20 Z" />
 
     <!-- leather strap holding the book shut -->
     <path
-        android:fillColor="#43290F"
+        android:fillColor="#4A1414"
         android:pathData="M57,14 L69,14 L69,94 L57,94 Z" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#2E1A0A"
+        android:strokeColor="#5C1010"
+        android:strokeAlpha="0.4"
+        android:strokeWidth="0.8"
+        android:pathData="M60,20 L60,88 M66,24 L66,84" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2E0C0C"
         android:strokeWidth="1"
         android:pathData="M57,14 L57,94 M69,14 L69,94" />
 
@@ -45,7 +80,7 @@
         android:fillColor="#C9A227"
         android:pathData="M63,45 A9,9 0 1,0 63.01,45 Z" />
     <path
-        android:fillColor="#5A3A22"
+        android:fillColor="#8E1F1F"
         android:pathData="M63,45 A4.2,4.2 0 1,0 63.01,45 Z" />
     <path
         android:fillColor="#8C6A1E"
@@ -53,6 +88,6 @@
 
     <!-- strap tongue below the buckle -->
     <path
-        android:fillColor="#3A2210"
+        android:fillColor="#3A0F0F"
         android:pathData="M60,54 L66,54 L66,68 L63,72 L60,68 Z" />
 </vector>
