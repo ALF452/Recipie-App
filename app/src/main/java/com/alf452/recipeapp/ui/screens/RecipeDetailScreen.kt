@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
@@ -145,7 +146,8 @@ fun RecipeDetailScreen(
                 ExtendedFloatingActionButton(
                     onClick = { onTimesMadeChanged(current.copy(timesMade = current.timesMade + 1)) },
                     icon = { Icon(Icons.Filled.Repeat, contentDescription = null) },
-                    text = { Text("Made it ${current.timesMade}×") }
+                    text = { Text("Made it ${current.timesMade}×") },
+                    modifier = Modifier.testTag("times_made_fab")
                 )
             }
         ) { padding ->

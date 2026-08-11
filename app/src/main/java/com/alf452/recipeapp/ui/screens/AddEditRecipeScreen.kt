@@ -79,6 +79,13 @@ fun AddEditRecipeScreen(
     var instructions by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
     var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
+    // Not shown in this form, but must round-trip: without these, saving an
+    // edit to an existing recipe would rebuild it from only the fields below
+    // and silently reset "times made" back to 0 and isFavorite back to
+    // false, since Recipe(...) with those args omitted just uses their
+    // defaults.
+    var timesMade by rememberSaveable { mutableStateOf(0) }
+    var isFavorite by rememberSaveable { mutableStateOf(false) }
     var pendingCameraUri by rememberSaveable { mutableStateOf<android.net.Uri?>(null) }
     // Guards the one-time "populate the form from the saved recipe" effect
     // below. Without this, editing an existing recipe, backgrounding mid-edit
@@ -122,6 +129,8 @@ fun AddEditRecipeScreen(
                 instructions = it.instructions
                 notes = it.notes
                 photoUri = it.photoUri
+                timesMade = it.timesMade
+                isFavorite = it.isFavorite
                 hasLoadedExistingRecipe = true
             }
         }
@@ -159,7 +168,9 @@ fun AddEditRecipeScreen(
                                             ingredients = ingredients.trim(),
                                             instructions = instructions.trim(),
                                             notes = notes.trim(),
-                                            photoUri = photoUri
+                                            photoUri = photoUri,
+                                            timesMade = timesMade,
+                                            isFavorite = isFavorite
                                         )
                                     )
                                 }

@@ -1,0 +1,56 @@
+package com.alf452.recipeapp
+
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+
+/**
+ * Regression test for a real bug found during review: AddEditRecipeScreen's
+ * Save button rebuilt the Recipe from only the fields shown on that screen,
+ * silently dropping timesMade and isFavorite back to their defaults (0 /
+ * false) on every edit. Drives the actual flow that exposed it — add a
+ * recipe, log it as made a few times, edit it, save — through the real
+ * MainActivity/NavGraph/ViewModel/Room stack, not a stand-in for it.
+ */
+@RunWith(RobolectricTestRunner::class)
+class TimesMadeSurvivesEditTest {
+
+    @get:Rule
+    val composeRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun `editing a recipe does not reset its times-made count`() {
+        // Add a recipe.
+        composeRule.onNodeWithContentDescription("Add recipe").performClick()
+        composeRule.onNodeWithTag("recipe_title_field").performTextInput("Chili")
+        composeRule.onNodeWithContentDescription("Save").performClick()
+        composeRule.waitForIdle()
+
+        // Open it and log it as made 3 times.
+        composeRule.onNodeWithText("Chili").performClick()
+        composeRule.waitForIdle()
+        repeat(3) {
+            composeRule.onNodeWithTag("times_made_fab").performClick()
+            composeRule.waitForIdle()
+        }
+        composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
+
+        // Edit it (change the title) and save.
+        composeRule.onNodeWithContentDescription("Edit").performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("recipe_title_field").performTextInput(" Verde")
+        composeRule.onNodeWithContentDescription("Save").performClick()
+        composeRule.waitForIdle()
+
+        // Back on the detail screen: the times-made count must still be 3.
+        composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
+    }
+}

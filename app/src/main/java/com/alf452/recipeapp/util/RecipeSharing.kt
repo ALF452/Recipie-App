@@ -20,7 +20,10 @@ fun buildShareText(recipe: Recipe): String {
  * Extracts and decodes a shared recipe from arbitrary pasted/forwarded text.
  * Locates the marker, then bracket-matches the JSON object that follows so
  * trailing text added by messaging/email apps (quoting, signatures) doesn't
- * break parsing. Returns null if no valid payload is found.
+ * break parsing. Braces inside JSON string values (e.g. a recipe whose
+ * instructions literally contain "{" or "}") are skipped rather than
+ * counted, so they can't unbalance the match. Returns null if no valid
+ * payload is found.
  */
 fun decodeSharedRecipe(text: String): SharedRecipe? {
     val prefixIndex = text.indexOf(SHARE_PREFIX)
@@ -30,9 +33,21 @@ fun decodeSharedRecipe(text: String): SharedRecipe? {
     if (jsonStart == -1) return null
 
     var depth = 0
+    var inString = false
+    var escapeNext = false
     var jsonEnd = -1
     for (i in jsonStart until text.length) {
-        when (text[i]) {
+        val c = text[i]
+        if (inString) {
+            when {
+                escapeNext -> escapeNext = false
+                c == '\\' -> escapeNext = true
+                c == '"' -> inString = false
+            }
+            continue
+        }
+        when (c) {
+            '"' -> inString = true
             '{' -> depth++
             '}' -> {
                 depth--
