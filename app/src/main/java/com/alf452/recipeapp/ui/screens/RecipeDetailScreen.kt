@@ -43,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,12 +75,16 @@ fun RecipeDetailScreen(
 ) {
     val recipe by recipeFlow.collectAsState(initial = null)
     val pantryItems by pantryItemsFlow.collectAsState(initial = emptyList())
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     val current = recipe ?: return
 
-    var pendingCameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    // rememberSaveable so a photo taken right before the process is reclaimed
+    // in the background (e.g. while the camera app is in the foreground) is
+    // still recorded onto the recipe when the camera result comes back,
+    // instead of leaving an orphaned file the app has forgotten about.
+    var pendingCameraUri by rememberSaveable { mutableStateOf<android.net.Uri?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->

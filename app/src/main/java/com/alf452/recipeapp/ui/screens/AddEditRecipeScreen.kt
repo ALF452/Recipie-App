@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
@@ -65,14 +67,26 @@ fun AddEditRecipeScreen(
 
     val context = LocalContext.current
 
-    var id by remember { mutableStateOf(0L) }
-    var title by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var ingredients by remember { mutableStateOf("") }
-    var instructions by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var photoUri by remember { mutableStateOf<String?>(null) }
-    var pendingCameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    // rememberSaveable (not remember): Android can kill this process while it's
+    // backgrounded — e.g. under memory pressure while the camera app launched
+    // below is in the foreground — and recreate the Activity from scratch when
+    // the user returns. Plain remember state is silently lost in that case,
+    // wiping whatever the user had typed; rememberSaveable survives it.
+    var id by rememberSaveable { mutableStateOf(0L) }
+    var title by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf("") }
+    var ingredients by rememberSaveable { mutableStateOf("") }
+    var instructions by rememberSaveable { mutableStateOf("") }
+    var notes by rememberSaveable { mutableStateOf("") }
+    var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingCameraUri by rememberSaveable { mutableStateOf<android.net.Uri?>(null) }
+    // Guards the one-time "populate the form from the saved recipe" effect
+    // below. Without this, editing an existing recipe, backgrounding mid-edit
+    // long enough for the process to die, and coming back would silently
+    // discard the just-restored unsaved edits: the Flow reconnects, emits
+    // the original (unedited) row again, and the effect below would
+    // overwrite the restored fields right back to their stored values.
+    var hasLoadedExistingRecipe by rememberSaveable { mutableStateOf(false) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -99,14 +113,17 @@ fun AddEditRecipeScreen(
     }
 
     LaunchedEffect(existingRecipe) {
-        existingRecipe?.let {
-            id = it.id
-            title = it.title
-            category = it.category
-            ingredients = it.ingredients
-            instructions = it.instructions
-            notes = it.notes
-            photoUri = it.photoUri
+        if (!hasLoadedExistingRecipe) {
+            existingRecipe?.let {
+                id = it.id
+                title = it.title
+                category = it.category
+                ingredients = it.ingredients
+                instructions = it.instructions
+                notes = it.notes
+                photoUri = it.photoUri
+                hasLoadedExistingRecipe = true
+            }
         }
     }
 
@@ -171,7 +188,10 @@ fun AddEditRecipeScreen(
                     onValueChange = { title = it },
                     label = { Text("Title") },
                     colors = darkTextFieldColors(),
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .testTag("recipe_title_field")
                 )
                 OutlinedTextField(
                     value = category,
