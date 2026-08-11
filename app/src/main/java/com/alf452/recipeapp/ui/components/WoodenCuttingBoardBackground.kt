@@ -29,8 +29,6 @@ private data class GrainLine(
     val widthPx: Float
 )
 
-private data class Knot(val plankIndex: Int, val xInPlank: Float, val yFraction: Float, val radiusFraction: Float)
-
 private data class Scratch(
     val xFraction: Float,
     val yFraction: Float,
@@ -61,7 +59,7 @@ private fun Color.blend(other: Color, fraction: Float): Color = Color(
  * Procedurally drawn background resembling a butcher-block cutting board: glued
  * vertical planks whose grain runs along their length (top to bottom, matching
  * how the strips were actually cut), each with a rounded, beveled edge so the
- * seams read as physical 3D ridges rather than flat stripes. Knots, fine pore
+ * seams read as physical 3D ridges rather than flat stripes. Fine pore
  * texture, knife scratches and a soft sheen add surface detail; a top contact
  * shadow and edge vignette separate it visually from the marble counter above
  * it. Fully generated, no image assets required.
@@ -95,17 +93,6 @@ fun WoodenCuttingBoardBackground(modifier: Modifier = Modifier, seed: Int = 42) 
         }
     }
 
-    val knots = remember(seed) {
-        List(5) {
-            Knot(
-                plankIndex = random.nextInt(planks.size),
-                xInPlank = 0.25f + random.nextFloat() * 0.5f,
-                yFraction = random.nextFloat(),
-                radiusFraction = 0.010f + random.nextFloat() * 0.014f
-            )
-        }
-    }
-
     val scratches = remember(seed) {
         List(26) {
             Scratch(
@@ -130,14 +117,13 @@ fun WoodenCuttingBoardBackground(modifier: Modifier = Modifier, seed: Int = 42) 
     }
 
     Canvas(modifier = modifier) {
-        drawWoodenBoard(planks, grainLines, knots, scratches, pores)
+        drawWoodenBoard(planks, grainLines, scratches, pores)
     }
 }
 
 private fun DrawScope.drawWoodenBoard(
     planks: List<Plank>,
     grainLines: List<GrainLine>,
-    knots: List<Knot>,
     scratches: List<Scratch>,
     pores: List<Pore>
 ) {
@@ -188,18 +174,6 @@ private fun DrawScope.drawWoodenBoard(
             Color.Black.copy(alpha = grain.alpha)
         }
         drawPath(path = path, color = color, style = Stroke(width = grain.widthPx))
-    }
-
-    for (knot in knots) {
-        val plank = planks[knot.plankIndex]
-        val left = plank.startFraction * w
-        val right = plank.endFraction * w
-        val center = Offset(left + knot.xInPlank * (right - left), knot.yFraction * h)
-        val radius = knot.radiusFraction * w
-        drawCircle(color = Color(0xFF4A2F18).copy(alpha = 0.28f), radius = radius * 1.15f, center = center)
-        drawCircle(color = Color(0xFF4A2F18).copy(alpha = 0.36f), radius = radius, center = center)
-        drawCircle(color = Color(0xFF3A2412).copy(alpha = 0.50f), radius = radius * 0.55f, center = center)
-        drawCircle(color = Color(0xFF2A1808).copy(alpha = 0.60f), radius = radius * 0.22f, center = center)
     }
 
     for (pore in pores) {
