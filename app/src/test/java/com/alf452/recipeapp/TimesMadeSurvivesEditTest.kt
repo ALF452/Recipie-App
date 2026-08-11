@@ -1,5 +1,6 @@
 package com.alf452.recipeapp
 
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertTextContains
@@ -75,10 +76,27 @@ class TimesMadeSurvivesEditTest {
         composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
     }
 
+    // Walks the *unmerged* tree from the FAB down through its actual
+    // children (Icon, Text) so we can see whether the Text composable
+    // exists and what it holds, regardless of whether/how its semantics
+    // get merged into the parent for assertTextContains's purposes.
     private fun printFabText(label: String) {
-        val node = composeRule.onNodeWithTag("times_made_fab").fetchSemanticsNode()
+        val root = composeRule.onNodeWithTag("times_made_fab", useUnmergedTree = true).fetchSemanticsNode()
+        val sb = StringBuilder()
+        dumpNode(root, 0, sb)
+        println("FAB_DEBUG[$label]\n$sb")
+    }
+
+    private fun dumpNode(node: SemanticsNode, depth: Int, sb: StringBuilder) {
         val text = node.config.getOrNull(SemanticsProperties.Text)
-        val editableText = node.config.getOrNull(SemanticsProperties.EditableText)
-        println("FAB_DEBUG[$label] text=$text editableText=$editableText")
+        val testTag = node.config.getOrNull(SemanticsProperties.TestTag)
+        val role = node.config.getOrNull(SemanticsProperties.Role)
+        sb.append("  ".repeat(depth))
+            .append("node id=").append(node.id)
+            .append(" tag=").append(testTag)
+            .append(" role=").append(role)
+            .append(" text=").append(text)
+            .append('\n')
+        node.children.forEach { dumpNode(it, depth + 1, sb) }
     }
 }
