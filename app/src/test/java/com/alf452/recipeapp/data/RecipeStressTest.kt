@@ -1,6 +1,7 @@
 package com.alf452.recipeapp.data
 
 import android.content.Context
+import androidx.core.content.FileProvider
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.alf452.recipeapp.util.createRecipePhotoUri
@@ -15,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
+import java.lang.reflect.Modifier
 
 /**
  * Exercises the same DAO/repository-level code the UI calls, at bulk scale,
@@ -33,6 +35,15 @@ class RecipeStressTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
+        // FileProvider resolves each authority's configured roots once and
+        // caches them in a static map for the life of the JVM. Robolectric
+        // gives every test method a fresh simulated app data directory, so a
+        // cache entry left over from an earlier test in this run points at a
+        // directory that no longer exists for this one — clear it so
+        // createRecipePhotoUri() re-resolves against the current test's
+        // context, same as it would on a real device where there's only ever
+        // one data directory for the app's whole lifetime.
+        resetFileProviderPathCache()
         db = Room.inMemoryDatabaseBuilder(context, RecipeDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -43,6 +54,15 @@ class RecipeStressTest {
     @After
     fun tearDown() {
         db.close()
+    }
+
+    private fun resetFileProviderPathCache() {
+        FileProvider::class.java.declaredFields
+            .filter { Modifier.isStatic(it.modifiers) && Map::class.java.isAssignableFrom(it.type) }
+            .forEach { field ->
+                field.isAccessible = true
+                (field.get(null) as? MutableMap<*, *>)?.clear()
+            }
     }
 
     @Test
