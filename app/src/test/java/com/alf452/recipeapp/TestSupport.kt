@@ -31,10 +31,10 @@ class ResetRecipeDatabaseRule : TestRule {
 }
 
 private fun resetRecipeDatabaseInstance() {
-    val companionField = RecipeDatabase::class.java.getDeclaredField("Companion")
-    companionField.isAccessible = true
-    val companion = companionField.get(null)
-    val instanceField = companion.javaClass.getDeclaredField("INSTANCE")
+    // Kotlin's JVM backend stores a companion object's backing fields as
+    // static fields on the *outer* class, not on the Companion class itself,
+    // so INSTANCE lives on RecipeDatabase directly.
+    val instanceField = RecipeDatabase::class.java.getDeclaredField("INSTANCE")
     instanceField.isAccessible = true
-    instanceField.set(companion, null)
+    instanceField.set(null, null)
 }
