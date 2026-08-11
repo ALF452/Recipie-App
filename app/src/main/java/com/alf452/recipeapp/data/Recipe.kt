@@ -13,5 +13,6 @@ data class Recipe(
     val instructions: String,
     val notes: String = "",
     val isFavorite: Boolean = false,
-    val photoUri: String? = null
+    val photoUri: String? = null,
+    val timesMade: Int = 0
 )

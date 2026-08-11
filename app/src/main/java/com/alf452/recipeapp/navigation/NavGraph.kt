@@ -65,7 +65,8 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
                     viewModel.deleteRecipe(recipe)
                     navController.popBackStack()
                 },
-                onPhotoUpdated = { updated -> viewModel.updateRecipe(updated) }
+                onPhotoUpdated = { updated -> viewModel.updateRecipe(updated) },
+                onTimesMadeChanged = { updated -> viewModel.updateRecipe(updated) }
             )
         }
 

@@ -24,9 +24,11 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,7 +69,8 @@ fun RecipeDetailScreen(
     onBack: () -> Unit,
     onEdit: (Long) -> Unit,
     onDelete: (Recipe) -> Unit,
-    onPhotoUpdated: (Recipe) -> Unit
+    onPhotoUpdated: (Recipe) -> Unit,
+    onTimesMadeChanged: (Recipe) -> Unit
 ) {
     val recipe by recipeFlow.collectAsState(initial = null)
     val pantryItems by pantryItemsFlow.collectAsState(initial = emptyList())
@@ -131,6 +134,13 @@ fun RecipeDetailScreen(
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")
                         }
                     }
+                )
+            },
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    onClick = { onTimesMadeChanged(current.copy(timesMade = current.timesMade + 1)) },
+                    icon = { Icon(Icons.Filled.Repeat, contentDescription = null) },
+                    text = { Text("Made it ${current.timesMade}×") }
                 )
             }
         ) { padding ->
