@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.util.buildShareText
 import com.alf452.recipeapp.util.createRecipePhotoUri
 import com.alf452.recipeapp.util.deletePhotoUri
@@ -85,96 +88,122 @@ fun RecipeDetailScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(current.title) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_SUBJECT, "Recipe: ${current.title}")
-                            putExtra(Intent.EXTRA_TEXT, buildShareText(current))
+    Box(modifier = Modifier.fillMaxSize()) {
+        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text(current.title) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
-                        context.startActivity(Intent.createChooser(shareIntent, "Share recipe"))
-                    }) {
-                        Icon(Icons.Filled.Share, contentDescription = "Share recipe")
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_SUBJECT, "Recipe: ${current.title}")
+                                putExtra(Intent.EXTRA_TEXT, buildShareText(current))
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Share recipe"))
+                        }) {
+                            Icon(Icons.Filled.Share, contentDescription = "Share recipe")
+                        }
+                        IconButton(onClick = {
+                            val uri = createRecipePhotoUri(context)
+                            pendingCameraUri = uri
+                            cameraLauncher.launch(uri)
+                        }) {
+                            Icon(
+                                Icons.Filled.PhotoCamera,
+                                contentDescription = if (current.photoUri != null) "Retake photo" else "Add photo"
+                            )
+                        }
+                        IconButton(onClick = { onEdit(current.id) }) {
+                            Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                        }
                     }
-                    IconButton(onClick = {
-                        val uri = createRecipePhotoUri(context)
-                        pendingCameraUri = uri
-                        cameraLauncher.launch(uri)
-                    }) {
-                        Icon(
-                            Icons.Filled.PhotoCamera,
-                            contentDescription = if (current.photoUri != null) "Retake photo" else "Add photo"
-                        )
-                    }
-                    IconButton(onClick = { onEdit(current.id) }) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            if (current.photoUri != null) {
-                AsyncImage(
-                    model = current.photoUri,
-                    contentDescription = "Photo from the last time this was made",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
                 )
-                Spacer(modifier = Modifier.height(12.dp))
             }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                if (current.photoUri != null) {
+                    AsyncImage(
+                        model = current.photoUri,
+                        contentDescription = "Photo from the last time this was made",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
-            if (current.category.isNotBlank()) {
-                Text(current.category, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
-            }
+                if (current.category.isNotBlank()) {
+                    Text(current.category, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
+                }
 
-            Text("Ingredients", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+                Text(
+                    "Ingredients",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
 
-            val ingredientLines = remember(current.ingredients) {
-                current.ingredients.lines().map { it.trim() }.filter { it.isNotEmpty() }
-            }
+                val ingredientLines = remember(current.ingredients) {
+                    current.ingredients.lines().map { it.trim() }.filter { it.isNotEmpty() }
+                }
 
-            if (ingredientLines.isEmpty()) {
-                Text(current.ingredients, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
-            } else {
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    ingredientLines.forEach { line ->
-                        val inStock = pantryItems.any { item -> line.contains(item.name, ignoreCase = true) }
-                        IngredientRow(text = line, inStock = inStock)
+                if (ingredientLines.isEmpty()) {
+                    Text(
+                        current.ingredients,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                } else {
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        ingredientLines.forEach { line ->
+                            val inStock = pantryItems.any { item -> line.contains(item.name, ignoreCase = true) }
+                            IngredientRow(text = line, inStock = inStock)
+                        }
                     }
                 }
-            }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-
-            Text("Instructions", style = MaterialTheme.typography.titleMedium)
-            Text(current.instructions, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
-
-            if (current.notes.isNotBlank()) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-                Text("Notes", style = MaterialTheme.typography.titleMedium)
-                Text(current.notes, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
+
+                Text("Instructions", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                Text(
+                    current.instructions,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                if (current.notes.isNotBlank()) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+                    Text("Notes", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                    Text(
+                        current.notes,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
         }
     }
@@ -222,6 +251,6 @@ private fun IngredientRow(text: String, inStock: Boolean) {
             modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyLarge)
+        Text(text = text, style = MaterialTheme.typography.bodyLarge, color = Color.Black)
     }
 }

@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
+import com.alf452.recipeapp.ui.components.darkTextFieldColors
 import com.alf452.recipeapp.util.createRecipePhotoUri
 import com.alf452.recipeapp.util.deletePhotoUri
 import kotlinx.coroutines.flow.Flow
@@ -169,14 +169,14 @@ fun AddEditRecipeScreen(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Title") },
-                    colors = recipeFieldColors(),
+                    colors = darkTextFieldColors(),
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                 )
                 OutlinedTextField(
                     value = category,
                     onValueChange = { category = it },
                     label = { Text("Category (optional)") },
-                    colors = recipeFieldColors(),
+                    colors = darkTextFieldColors(),
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
                 )
                 OutlinedTextField(
@@ -184,7 +184,7 @@ fun AddEditRecipeScreen(
                     onValueChange = { ingredients = it },
                     label = { Text("Ingredients") },
                     placeholder = { Text("One per line") },
-                    colors = recipeFieldColors(),
+                    colors = darkTextFieldColors(),
                     minLines = 4,
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
                 )
@@ -192,7 +192,7 @@ fun AddEditRecipeScreen(
                     value = instructions,
                     onValueChange = { instructions = it },
                     label = { Text("Instructions") },
-                    colors = recipeFieldColors(),
+                    colors = darkTextFieldColors(),
                     minLines = 6,
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
                 )
@@ -200,7 +200,7 @@ fun AddEditRecipeScreen(
                     value = notes,
                     onValueChange = { notes = it },
                     label = { Text("Notes (optional)") },
-                    colors = recipeFieldColors(),
+                    colors = darkTextFieldColors(),
                     minLines = 2,
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
                 )
@@ -214,16 +214,6 @@ fun AddEditRecipeScreen(
         }
     }
 }
-
-@Composable
-private fun recipeFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = Color.Black,
-    unfocusedTextColor = Color.Black,
-    focusedLabelColor = Color.Black,
-    unfocusedLabelColor = Color.Black,
-    focusedPlaceholderColor = Color.Black,
-    unfocusedPlaceholderColor = Color.Black
-)
 
 @Composable
 private fun PhotoPicker(photoUri: String?, onTakePhotoClick: () -> Unit) {

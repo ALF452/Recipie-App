@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,9 +36,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.PantryItem
+import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
+import com.alf452.recipeapp.ui.components.darkTextFieldColors
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,78 +62,86 @@ fun PantryScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("My Pantry") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+    Box(modifier = Modifier.fillMaxSize()) {
+        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text("My Pantry") },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Add the food, spices, and herbs you have on hand. Recipe ingredients will be highlighted green when you already have them, red when you don't.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = newItemName,
+                        onValueChange = { newItemName = it },
+                        label = { Text("Item name") },
+                        colors = darkTextFieldColors(),
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { submitNewItem() })
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = { submitNewItem() }) {
+                        Icon(Icons.Filled.Add, contentDescription = "Add item")
                     }
                 }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Add the food, spices, and herbs you have on hand. Recipe ingredients will be highlighted green when you already have them, red when you don't.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider()
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = newItemName,
-                    onValueChange = { newItemName = it },
-                    label = { Text("Item name") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { submitNewItem() })
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { submitNewItem() }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add item")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider()
-
-            if (pantryItems.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Your pantry is empty.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    items(pantryItems, key = { it.id }) { item ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = item.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = { onDeleteItem(item) }) {
-                                Icon(Icons.Filled.Delete, contentDescription = "Remove ${item.name}")
+                if (pantryItems.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Your pantry is empty.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                    }
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        items(pantryItems, key = { it.id }) { item ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = item.name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(onClick = { onDeleteItem(item) }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Remove ${item.name}")
+                                }
                             }
+                            HorizontalDivider()
                         }
-                        HorizontalDivider()
                     }
                 }
             }
