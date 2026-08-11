@@ -38,14 +38,16 @@ class TimesMadeSurvivesEditTest {
         composeRule.onNodeWithContentDescription("Save").performClick()
         composeRule.waitForIdle()
 
-        // Open it and log it as made 3 times.
+        // Open it and log it as made 3 times, checking the count after each
+        // individual tap so a CI failure here pinpoints exactly which
+        // increment broke instead of only "somewhere in these three taps".
         composeRule.onNodeWithText("Chili").performClick()
         composeRule.waitForIdle()
-        repeat(3) {
+        for (expected in 1..3) {
             composeRule.onNodeWithTag("times_made_fab").performClick()
             composeRule.waitForIdle()
+            composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it ${expected}×", substring = true)
         }
-        composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
 
         // Edit it (change the title) and save.
         composeRule.onNodeWithContentDescription("Edit").performClick()
