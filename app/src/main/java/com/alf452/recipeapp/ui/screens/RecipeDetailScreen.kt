@@ -81,6 +81,16 @@ fun RecipeDetailScreen(
 
     val current = recipe ?: return
 
+    // Seeded from current.timesMade once, then owns the count locally.
+    // current.timesMade only reflects the latest tap once its DB write has
+    // round-tripped back through the Flow, so if the FAB below just read
+    // current.timesMade directly, two taps close together would both read
+    // the same stale value and each submit base+1 — losing one of the
+    // increments. Building each tap on this local counter instead means
+    // rapid taps always compound correctly regardless of how fast the
+    // write/Flow round-trip keeps up.
+    var timesMadeCounter by rememberSaveable { mutableStateOf(current.timesMade) }
+
     // rememberSaveable so a photo taken right before the process is reclaimed
     // in the background (e.g. while the camera app is in the foreground) is
     // still recorded onto the recipe when the camera result comes back,
@@ -144,9 +154,13 @@ fun RecipeDetailScreen(
             },
             floatingActionButton = {
                 ExtendedFloatingActionButton(
-                    onClick = { onTimesMadeChanged(current.copy(timesMade = current.timesMade + 1)) },
+                    onClick = {
+                        val next = timesMadeCounter + 1
+                        timesMadeCounter = next
+                        onTimesMadeChanged(current.copy(timesMade = next))
+                    },
                     icon = { Icon(Icons.Filled.Repeat, contentDescription = null) },
-                    text = { Text("Made it ${current.timesMade}×") },
+                    text = { Text("Made it ${timesMadeCounter}×") },
                     modifier = Modifier.testTag("times_made_fab")
                 )
             }

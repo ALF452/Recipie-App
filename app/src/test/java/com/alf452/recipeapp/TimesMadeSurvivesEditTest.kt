@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,11 +47,19 @@ class TimesMadeSurvivesEditTest {
         // Edit it (change the title) and save.
         composeRule.onNodeWithContentDescription("Edit").performClick()
         composeRule.waitForIdle()
-        composeRule.onNodeWithTag("recipe_title_field").performTextInput(" Verde")
+        composeRule.onNodeWithTag("recipe_title_field").performTextReplacement("Chili Verde")
         composeRule.onNodeWithContentDescription("Save").performClick()
         composeRule.waitForIdle()
 
-        // Back on the detail screen: the times-made count must still be 3.
+        // Leave the detail screen entirely and reopen the recipe from the
+        // list, so this reads the value actually persisted to the database
+        // rather than in-session UI state that survived the edit's screen
+        // navigation regardless of what got saved.
+        composeRule.onNodeWithContentDescription("Back").performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Chili Verde").performClick()
+        composeRule.waitForIdle()
+
         composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
     }
 }
