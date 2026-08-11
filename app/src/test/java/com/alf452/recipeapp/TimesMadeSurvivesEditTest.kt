@@ -1,8 +1,5 @@
 package com.alf452.recipeapp
 
-import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -46,15 +43,10 @@ class TimesMadeSurvivesEditTest {
         // increment broke instead of only "somewhere in these three taps".
         composeRule.onNodeWithText("Chili").performClick()
         composeRule.waitForIdle()
-        // Diagnostic: print the FAB's actual text to stdout before asserting,
-        // since assertTextContains's failure message doesn't include the
-        // node's actual text value, only that it didn't match.
-        printFabText("initial")
         for (expected in 1..3) {
             composeRule.onNodeWithTag("times_made_fab").performClick()
             composeRule.waitForIdle()
-            printFabText("after_tap_$expected")
-            composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it ${expected}×", substring = true)
+            assertFabShows("Made it ${expected}×")
         }
 
         // Edit it (change the title) and save.
@@ -73,30 +65,18 @@ class TimesMadeSurvivesEditTest {
         composeRule.onNodeWithText("Chili Verde").performClick()
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
+        assertFabShows("Made it 3×")
     }
 
-    // Walks the *unmerged* tree from the FAB down through its actual
-    // children (Icon, Text) so we can see whether the Text composable
-    // exists and what it holds, regardless of whether/how its semantics
-    // get merged into the parent for assertTextContains's purposes.
-    private fun printFabText(label: String) {
-        val root = composeRule.onNodeWithTag("times_made_fab", useUnmergedTree = true).fetchSemanticsNode()
-        val sb = StringBuilder()
-        dumpNode(root, 0, sb)
-        println("FAB_DEBUG[$label]\n$sb")
-    }
-
-    private fun dumpNode(node: SemanticsNode, depth: Int, sb: StringBuilder) {
-        val text = node.config.getOrNull(SemanticsProperties.Text)
-        val testTag = node.config.getOrNull(SemanticsProperties.TestTag)
-        val role = node.config.getOrNull(SemanticsProperties.Role)
-        sb.append("  ".repeat(depth))
-            .append("node id=").append(node.id)
-            .append(" tag=").append(testTag)
-            .append(" role=").append(role)
-            .append(" text=").append(text)
-            .append('\n')
-        node.children.forEach { dumpNode(it, depth + 1, sb) }
+    // ExtendedFloatingActionButton wraps its text label two semantics levels
+    // below the tagged node (FAB -> internal animation container -> Text),
+    // and Compose's semantics merging doesn't bridge that gap here even
+    // though the FAB reports MergeDescendants = true — confirmed by dumping
+    // the unmerged tree, which showed the label's real text sitting on that
+    // untagged grandchild. assertTextContains against the tagged parent node
+    // can't see it, so match the visible label directly instead.
+    private fun assertFabShows(label: String) {
+        composeRule.onNodeWithText(label, substring = true, useUnmergedTree = true)
+            .assertTextContains(label, substring = true)
     }
 }
