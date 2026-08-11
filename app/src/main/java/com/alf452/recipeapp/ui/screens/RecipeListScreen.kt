@@ -43,8 +43,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
-import com.alf452.recipeapp.ui.components.WindowHerbGardenBackground
+import com.alf452.recipeapp.ui.components.MarbleCountertopBackground
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
+import com.alf452.recipeapp.ui.theme.RecipeBrownDark
 import com.alf452.recipeapp.ui.theme.RecipeCream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,13 +66,13 @@ fun RecipeListScreen(
             containerColor = Color.Transparent,
             topBar = {
                 Box {
-                    WindowHerbGardenBackground(modifier = Modifier.matchParentSize())
+                    MarbleCountertopBackground(modifier = Modifier.matchParentSize())
                     LargeTopAppBar(
                         title = { Text("My Cookbook") },
                         colors = TopAppBarDefaults.largeTopAppBarColors(
                             containerColor = Color.Transparent,
                             scrolledContainerColor = Color.Transparent,
-                            titleContentColor = RecipeCream
+                            titleContentColor = RecipeBrownDark
                         ),
                         actions = {
                             TopBarScrimIconButton(onClick = onImportClick) {
