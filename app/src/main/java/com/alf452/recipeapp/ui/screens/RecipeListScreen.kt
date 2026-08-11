@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.WindowHerbGardenBackground
 import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.ui.theme.RecipeCream
 
@@ -62,29 +64,25 @@ fun RecipeListScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                LargeTopAppBar(
-                    title = { Text("My Cookbook") },
-                    colors = TopAppBarDefaults.largeTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    actions = {
-                        IconButton(onClick = onImportClick) {
-                            Icon(
-                                Icons.Filled.Inbox,
-                                contentDescription = "Import Recipe",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                Box {
+                    WindowHerbGardenBackground(modifier = Modifier.matchParentSize())
+                    LargeTopAppBar(
+                        title = { Text("My Cookbook") },
+                        colors = TopAppBarDefaults.largeTopAppBarColors(
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
+                            titleContentColor = RecipeCream
+                        ),
+                        actions = {
+                            TopBarScrimIconButton(onClick = onImportClick) {
+                                Icon(Icons.Filled.Inbox, contentDescription = "Import Recipe", tint = Color.White)
+                            }
+                            TopBarScrimIconButton(onClick = onPantryClick) {
+                                Icon(Icons.Filled.Kitchen, contentDescription = "My Pantry", tint = Color.White)
+                            }
                         }
-                        IconButton(onClick = onPantryClick) {
-                            Icon(
-                                Icons.Filled.Kitchen,
-                                contentDescription = "My Pantry",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                )
+                    )
+                }
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = onAddClick) {
@@ -107,6 +105,21 @@ fun RecipeListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TopBarScrimIconButton(onClick: () -> Unit, content: @Composable () -> Unit) {
+    IconButton(onClick = onClick) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(Color.Black.copy(alpha = 0.28f)),
+            contentAlignment = Alignment.Center
+        ) {
+            content()
         }
     }
 }
