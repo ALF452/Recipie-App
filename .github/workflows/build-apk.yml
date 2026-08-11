@@ -59,14 +59,18 @@ jobs:
             Auto-built demo APK of My Cookbook from the latest push to `claude/android-recipe-app-0is30s`.
 
             This is a minified, resource-shrunk release build (R8 code
-            shrinking + unused-resource removal), signed with an
-            auto-generated debug key so it installs directly without a Play
-            Store account. Asset is still named `app-debug.apk` to keep the
-            download link stable across builds.
+            shrinking + unused-resource removal), signed with a stable
+            demo key committed to the repo (not a real Play Store secret)
+            so it installs directly without a Play Store account, and so
+            every build shares the same signature. Asset is still named
+            `app-debug.apk` to keep the download link stable across builds.
 
             **To install:** download `app-debug.apk` to your Android phone
             (Android 8.0+), open it, and allow installs from unknown sources
-            when prompted.
+            when prompted. Because every build now shares the same signing
+            key, installing a new download over an existing install is a
+            normal in-place update — your saved recipes are preserved, no
+            need to uninstall first.
 
             This asset is replaced on every push — always the latest build.
           files: app/build/outputs/apk/release/app-debug.apk

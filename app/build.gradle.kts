@@ -14,7 +14,11 @@ android {
         applicationId = "com.alf452.recipeapp"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        // Ties the installed build's version to the CI run that produced it
+        // so a freshly downloaded APK is always treated as a newer version
+        // than whatever is already installed (never a "downgrade" that
+        // Android would refuse to install over existing data).
+        versionCode = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1)
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,6 +29,25 @@ android {
         resConfigs("en")
     }
 
+    signingConfigs {
+        create("release") {
+            // A committed, stable demo key (not a real Play Store secret) so
+            // every CI build is signed identically. Android refuses to
+            // install an APK as an *update* over an app with a different
+            // signature — it forces an uninstall first, which wipes all
+            // local data. Using Gradle's default debug signing config here
+            // was exactly that bug: a fresh ephemeral CI runner regenerates
+            // ~/.android/debug.keystore with a brand-new random key on every
+            // single build, so every "update" silently required wiping the
+            // user's saved recipes. This keystore is committed to the repo
+            // specifically so that never happens again.
+            storeFile = file("../keystore/release.keystore")
+            storePassword = "mycookbook-release"
+            keyAlias = "mycookbook"
+            keyPassword = "mycookbook-release"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -33,10 +56,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Signed with the auto-generated debug key so CI can produce an
-            // installable APK without any real signing secrets. This build is
-            // for sideloaded testing, not a Play Store release.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
