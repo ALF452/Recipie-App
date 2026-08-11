@@ -12,5 +12,6 @@ data class Recipe(
     val ingredients: String,
     val instructions: String,
     val notes: String = "",
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val photoUri: String? = null
 )

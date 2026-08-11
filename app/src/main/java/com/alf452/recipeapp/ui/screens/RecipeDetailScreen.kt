@@ -1,11 +1,14 @@
 package com.alf452.recipeapp.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -38,9 +42,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.util.createRecipePhotoUri
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,13 +58,26 @@ fun RecipeDetailScreen(
     pantryItemsFlow: Flow<List<PantryItem>>,
     onBack: () -> Unit,
     onEdit: (Long) -> Unit,
-    onDelete: (Recipe) -> Unit
+    onDelete: (Recipe) -> Unit,
+    onPhotoUpdated: (Recipe) -> Unit
 ) {
     val recipe by recipeFlow.collectAsState(initial = null)
     val pantryItems by pantryItemsFlow.collectAsState(initial = emptyList())
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val current = recipe ?: return
+
+    var pendingCameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            pendingCameraUri?.let { uri ->
+                onPhotoUpdated(current.copy(photoUri = uri.toString()))
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -68,6 +89,16 @@ fun RecipeDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        val uri = createRecipePhotoUri(context)
+                        pendingCameraUri = uri
+                        cameraLauncher.launch(uri)
+                    }) {
+                        Icon(
+                            Icons.Filled.PhotoCamera,
+                            contentDescription = if (current.photoUri != null) "Retake photo" else "Add photo"
+                        )
+                    }
                     IconButton(onClick = { onEdit(current.id) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                     }
@@ -85,6 +116,19 @@ fun RecipeDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            if (current.photoUri != null) {
+                AsyncImage(
+                    model = current.photoUri,
+                    contentDescription = "Photo from the last time this was made",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             if (current.category.isNotBlank()) {
                 Text(current.category, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
             }
