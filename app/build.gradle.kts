@@ -79,6 +79,14 @@ tasks.withType<Test>().configureEach {
         "--add-opens=java.base/java.text=ALL-UNNAMED",
         "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
     )
+    testLogging {
+        events("failed", "passed")
+        showStackTraces = true
+        showCauses = true
+        showExceptions = true
+        showStandardStreams = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 dependencies {
