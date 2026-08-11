@@ -69,6 +69,7 @@ android {
 // Robolectric shadows ContentResolver/FileProvider internals via reflection;
 // JDK 17's module system blocks that by default unless these are opened up.
 tasks.withType<Test>().configureEach {
+    maxHeapSize = "2g"
     jvmArgs(
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/java.util=ALL-UNNAMED",

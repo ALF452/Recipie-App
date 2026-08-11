@@ -119,4 +119,99 @@ class RecipeStressTest {
         val filesAfterDelete = photosDir.listFiles()?.size ?: 0
         assertEquals("expected no orphaned photo files, found $filesAfterDelete", 0, filesAfterDelete)
     }
+
+    /**
+     * Heavier version of the above: 1000 recipes per cycle, each with a real
+     * photo file, across 3 full add-then-delete-everything cycles. Records
+     * used-heap after each cycle (post-GC) to catch the classic leak signature
+     * — memory that keeps climbing cycle over cycle instead of returning to
+     * baseline once everything from that cycle has been deleted.
+     */
+    @Test
+    fun `1000 recipes with photos across repeated cycles show no memory growth or orphaned files`() = runBlocking {
+        val photosDir = File(context.filesDir, "recipe_photos")
+        val cycles = 3
+        val perCycle = 1000
+        val usedMemoryMbAfterCycle = mutableListOf<Double>()
+
+        repeat(cycles) { cycleIndex ->
+            val cycleNumber = cycleIndex + 1
+            val photoUris = mutableListOf<String>()
+            val recipeIds = mutableListOf<Long>()
+
+            for (i in 1..perCycle) {
+                val uri = createRecipePhotoUri(context)
+                context.contentResolver.openOutputStream(uri)?.use { out ->
+                    out.write(ByteArray(2048) { b -> (b % 256).toByte() })
+                }
+                photoUris += uri.toString()
+
+                val id = recipeDao.insertRecipe(
+                    Recipe(
+                        title = "Stress Recipe c$cycleNumber-$i",
+                        category = if (i % 3 == 0) "Dessert" else "",
+                        ingredients = "ingredient a\ningredient b $i",
+                        instructions = "Step 1\nStep 2 for recipe $i",
+                        notes = if (i % 5 == 0) "note $i" else "",
+                        photoUri = uri.toString()
+                    )
+                )
+                recipeIds += id
+
+                if (i % 100 == 0) {
+                    println("STRESS_PROGRESS cycle=$cycleNumber/$cycles phase=insert recipe=$i/$perCycle")
+                }
+            }
+
+            assertEquals("cycle $cycleNumber: insert should produce $perCycle unique ids", perCycle, recipeIds.toSet().size)
+            assertEquals("cycle $cycleNumber: createRecipePhotoUri should produce $perCycle unique filenames", perCycle, photoUris.toSet().size)
+
+            val afterInsert = recipeDao.getAllRecipes().first()
+            assertEquals("cycle $cycleNumber: all recipes present after insert", perCycle, afterInsert.size)
+
+            val filesAfterCreate = photosDir.listFiles()?.size ?: 0
+            assertEquals("cycle $cycleNumber: all photo files present after insert", perCycle, filesAfterCreate)
+
+            afterInsert.forEachIndexed { i, recipe ->
+                recipe.photoUri?.let { deletePhotoUri(context, it) }
+                recipeDao.deleteRecipe(recipe)
+                if ((i + 1) % 100 == 0) {
+                    println("STRESS_PROGRESS cycle=$cycleNumber/$cycles phase=delete recipe=${i + 1}/$perCycle")
+                }
+            }
+
+            val afterDelete = recipeDao.getAllRecipes().first()
+            assertTrue("cycle $cycleNumber: expected no recipes left, found ${afterDelete.size}", afterDelete.isEmpty())
+
+            val filesAfterDelete = photosDir.listFiles()?.size ?: 0
+            assertEquals("cycle $cycleNumber: expected no orphaned photo files, found $filesAfterDelete", 0, filesAfterDelete)
+
+            val usedMb = usedMemoryMb()
+            usedMemoryMbAfterCycle += usedMb
+            println("STRESS_PROGRESS cycle=$cycleNumber/$cycles complete usedMemoryMb=${"%.1f".format(usedMb)}")
+        }
+
+        println("STRESS_MEMORY_SAMPLES_MB ${usedMemoryMbAfterCycle.joinToString { "%.1f".format(it) }}")
+
+        val baselineMb = usedMemoryMbAfterCycle.first()
+        val finalMb = usedMemoryMbAfterCycle.last()
+        val growthMb = finalMb - baselineMb
+        assertTrue(
+            "used heap grew by ${"%.1f".format(growthMb)}MB across $cycles cycles of $perCycle recipes+photos " +
+                "each (baseline ${"%.1f".format(baselineMb)}MB -> final ${"%.1f".format(finalMb)}MB); a real leak " +
+                "would show unbounded growth here since every recipe and photo from each cycle was fully deleted " +
+                "before the next cycle started",
+            growthMb < 40.0
+        )
+    }
+
+    private fun usedMemoryMb(): Double {
+        // Force a full collection before sampling so we're measuring live
+        // retained objects, not garbage that just hasn't been swept yet.
+        System.gc()
+        Thread.sleep(50)
+        System.gc()
+        val runtime = Runtime.getRuntime()
+        return (runtime.totalMemory() - runtime.freeMemory()) / (1024.0 * 1024.0)
+    }
 }
