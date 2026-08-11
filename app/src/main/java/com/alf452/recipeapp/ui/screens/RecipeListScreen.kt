@@ -27,9 +27,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
+import com.alf452.recipeapp.ui.theme.RecipeCream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,34 +43,39 @@ fun RecipeListScreen(
 ) {
     val recipes by recipesFlow.collectAsState(initial = emptyList())
 
-    Scaffold(
-        topBar = {
-            LargeTopAppBar(
-                title = { Text("Recipe Box") },
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+    Box(modifier = Modifier.fillMaxSize()) {
+        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                LargeTopAppBar(
+                    title = { Text("Recipe Box") },
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Filled.Add, contentDescription = "Add recipe")
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = onAddClick) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add recipe")
+                }
             }
-        }
-    ) { padding ->
-        if (recipes.isEmpty()) {
-            EmptyState(padding)
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(recipes, key = { it.id }) { recipe ->
-                    RecipeCard(recipe = recipe, onClick = { onRecipeClick(recipe.id) })
+        ) { padding ->
+            if (recipes.isEmpty()) {
+                EmptyState(padding)
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(recipes, key = { it.id }) { recipe ->
+                        RecipeCard(recipe = recipe, onClick = { onRecipeClick(recipe.id) })
+                    }
                 }
             }
         }
@@ -82,22 +90,30 @@ private fun EmptyState(padding: PaddingValues) {
             .padding(padding),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Filled.MenuBook,
-                contentDescription = null,
-                modifier = Modifier.padding(bottom = 12.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "No recipes yet",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Tap + to add your first recipe",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        Card(
+            colors = CardDefaults.cardColors(containerColor = RecipeCream.copy(alpha = 0.92f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Icon(
+                    Icons.Filled.MenuBook,
+                    contentDescription = null,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "No recipes yet",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Tap + to add your first recipe",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
@@ -107,7 +123,8 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = RecipeCream),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = recipe.title, style = MaterialTheme.typography.titleMedium)
