@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.RestaurantMenu
@@ -50,7 +51,8 @@ fun RecipeListScreen(
     recipesFlow: kotlinx.coroutines.flow.Flow<List<Recipe>>,
     onAddClick: () -> Unit,
     onRecipeClick: (Long) -> Unit,
-    onPantryClick: () -> Unit
+    onPantryClick: () -> Unit,
+    onImportClick: () -> Unit
 ) {
     val recipes by recipesFlow.collectAsState(initial = emptyList())
 
@@ -67,6 +69,13 @@ fun RecipeListScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     actions = {
+                        IconButton(onClick = onImportClick) {
+                            Icon(
+                                Icons.Filled.Inbox,
+                                contentDescription = "Import Recipe",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                         IconButton(onClick = onPantryClick) {
                             Icon(
                                 Icons.Filled.Kitchen,

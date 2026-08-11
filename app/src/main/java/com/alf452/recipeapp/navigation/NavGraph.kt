@@ -1,6 +1,8 @@
 package com.alf452.recipeapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.alf452.recipeapp.ui.RecipeViewModel
 import com.alf452.recipeapp.ui.screens.AddEditRecipeScreen
+import com.alf452.recipeapp.ui.screens.ImportRecipeScreen
 import com.alf452.recipeapp.ui.screens.PantryScreen
 import com.alf452.recipeapp.ui.screens.RecipeDetailScreen
 import com.alf452.recipeapp.ui.screens.RecipeListScreen
@@ -19,6 +22,7 @@ private object Routes {
     const val ADD = "recipe_add"
     const val EDIT = "recipe_edit/{recipeId}"
     const val PANTRY = "pantry"
+    const val IMPORT = "import"
 
     fun detail(id: Long) = "recipe_detail/$id"
     fun edit(id: Long) = "recipe_edit/$id"
@@ -28,13 +32,21 @@ private object Routes {
 fun RecipeNavGraph(viewModel: RecipeViewModel) {
     val navController: NavHostController = rememberNavController()
 
+    val pendingSharedText by viewModel.pendingSharedText
+    LaunchedEffect(pendingSharedText) {
+        if (pendingSharedText != null) {
+            navController.navigate(Routes.IMPORT)
+        }
+    }
+
     NavHost(navController = navController, startDestination = Routes.LIST) {
         composable(Routes.LIST) {
             RecipeListScreen(
                 recipesFlow = viewModel.allRecipes,
                 onAddClick = { navController.navigate(Routes.ADD) },
                 onRecipeClick = { id -> navController.navigate(Routes.detail(id)) },
-                onPantryClick = { navController.navigate(Routes.PANTRY) }
+                onPantryClick = { navController.navigate(Routes.PANTRY) },
+                onImportClick = { navController.navigate(Routes.IMPORT) }
             )
         }
 
@@ -88,6 +100,24 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
                 onBack = { navController.popBackStack() },
                 onAddItem = { name -> viewModel.addPantryItem(name) },
                 onDeleteItem = { item -> viewModel.deletePantryItem(item) }
+            )
+        }
+
+        composable(Routes.IMPORT) {
+            ImportRecipeScreen(
+                initialSharedText = pendingSharedText,
+                onBack = {
+                    viewModel.consumePendingSharedText()
+                    navController.popBackStack()
+                },
+                onImport = { recipe ->
+                    viewModel.consumePendingSharedText()
+                    viewModel.saveRecipe(recipe) { newId ->
+                        navController.navigate(Routes.detail(newId)) {
+                            popUpTo(Routes.LIST)
+                        }
+                    }
+                }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.alf452.recipeapp.ui.screens
 
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.util.buildShareText
 import com.alf452.recipeapp.util.createRecipePhotoUri
 import kotlinx.coroutines.flow.Flow
 
@@ -89,6 +92,16 @@ fun RecipeDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_SUBJECT, "Recipe: ${current.title}")
+                            putExtra(Intent.EXTRA_TEXT, buildShareText(current))
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "Share recipe"))
+                    }) {
+                        Icon(Icons.Filled.Share, contentDescription = "Share recipe")
+                    }
                     IconButton(onClick = {
                         val uri = createRecipePhotoUri(context)
                         pendingCameraUri = uri

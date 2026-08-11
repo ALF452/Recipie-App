@@ -1,6 +1,7 @@
 package com.alf452.recipeapp.ui
 
 import android.app.Application
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.alf452.recipeapp.data.PantryItem
@@ -19,6 +20,17 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     val allRecipes: Flow<List<Recipe>> = repository.allRecipes
     val allPantryItems: Flow<List<PantryItem>> = pantryRepository.allItems
+
+    /** Text handed off from an incoming share intent, waiting to be reviewed on the Import screen. */
+    val pendingSharedText = mutableStateOf<String?>(null)
+
+    fun setPendingSharedText(text: String?) {
+        pendingSharedText.value = text
+    }
+
+    fun consumePendingSharedText() {
+        pendingSharedText.value = null
+    }
 
     fun getRecipeById(id: Long): Flow<Recipe?> = repository.getRecipeById(id)
 
