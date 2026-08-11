@@ -1,0 +1,53 @@
+name: Build Demo APK
+
+on:
+  push:
+    branches:
+      - claude/android-recipe-app-0is30s
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: recipe-box-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish APK to demo release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: demo-apk
+          name: "Recipe Box - Demo APK"
+          body: |
+            Auto-built debug APK of Recipe Box from the latest push to `claude/android-recipe-app-0is30s`.
+
+            **To install:** download `app-debug.apk` to your Android phone (Android 8.0+), open it, and allow installs from unknown sources when prompted.
+
+            This asset is replaced on every push — always the latest build.
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
