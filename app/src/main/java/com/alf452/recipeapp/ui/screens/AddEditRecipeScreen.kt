@@ -22,9 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,11 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
 import com.alf452.recipeapp.util.createRecipePhotoUri
 import com.alf452.recipeapp.util.deletePhotoUri
 import kotlinx.coroutines.flow.Flow
@@ -107,98 +111,119 @@ fun AddEditRecipeScreen(
 
     val isEditing = existingRecipeFlow != null
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (isEditing) "Edit Recipe" else "New Recipe") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            if (title.isNotBlank()) {
-                                val originalPhotoUri = existingRecipe?.photoUri
-                                if (originalPhotoUri != null && originalPhotoUri != photoUri) {
-                                    deletePhotoUri(context, originalPhotoUri)
-                                }
-                                onSave(
-                                    Recipe(
-                                        id = id,
-                                        title = title.trim(),
-                                        category = category.trim(),
-                                        ingredients = ingredients.trim(),
-                                        instructions = instructions.trim(),
-                                        notes = notes.trim(),
-                                        photoUri = photoUri
-                                    )
-                                )
-                            }
-                        }
-                    ) {
-                        Icon(Icons.Filled.Check, contentDescription = "Save")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            PhotoPicker(
-                photoUri = photoUri,
-                onTakePhotoClick = { launchCamera() }
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
 
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-            )
-            OutlinedTextField(
-                value = category,
-                onValueChange = { category = it },
-                label = { Text("Category (optional)") },
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-            )
-            OutlinedTextField(
-                value = ingredients,
-                onValueChange = { ingredients = it },
-                label = { Text("Ingredients") },
-                placeholder = { Text("One per line") },
-                minLines = 4,
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-            )
-            OutlinedTextField(
-                value = instructions,
-                onValueChange = { instructions = it },
-                label = { Text("Instructions") },
-                minLines = 6,
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-            )
-            OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
-                label = { Text("Notes (optional)") },
-                minLines = 2,
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-            )
-            Text(
-                text = "Title is required to save.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text(if (isEditing) "Edit Recipe" else "New Recipe") },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                if (title.isNotBlank()) {
+                                    val originalPhotoUri = existingRecipe?.photoUri
+                                    if (originalPhotoUri != null && originalPhotoUri != photoUri) {
+                                        deletePhotoUri(context, originalPhotoUri)
+                                    }
+                                    onSave(
+                                        Recipe(
+                                            id = id,
+                                            title = title.trim(),
+                                            category = category.trim(),
+                                            ingredients = ingredients.trim(),
+                                            instructions = instructions.trim(),
+                                            notes = notes.trim(),
+                                            photoUri = photoUri
+                                        )
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Filled.Check, contentDescription = "Save")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                PhotoPicker(
+                    photoUri = photoUri,
+                    onTakePhotoClick = { launchCamera() }
+                )
+
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") },
+                    colors = recipeFieldColors(),
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                )
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category (optional)") },
+                    colors = recipeFieldColors(),
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                )
+                OutlinedTextField(
+                    value = ingredients,
+                    onValueChange = { ingredients = it },
+                    label = { Text("Ingredients") },
+                    placeholder = { Text("One per line") },
+                    colors = recipeFieldColors(),
+                    minLines = 4,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                )
+                OutlinedTextField(
+                    value = instructions,
+                    onValueChange = { instructions = it },
+                    label = { Text("Instructions") },
+                    colors = recipeFieldColors(),
+                    minLines = 6,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                )
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text("Notes (optional)") },
+                    colors = recipeFieldColors(),
+                    minLines = 2,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                )
+                Text(
+                    text = "Title is required to save.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun recipeFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = Color.Black,
+    unfocusedTextColor = Color.Black,
+    focusedLabelColor = Color.Black,
+    unfocusedLabelColor = Color.Black,
+    focusedPlaceholderColor = Color.Black,
+    unfocusedPlaceholderColor = Color.Black
+)
 
 @Composable
 private fun PhotoPicker(photoUri: String?, onTakePhotoClick: () -> Unit) {
