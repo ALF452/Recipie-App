@@ -1,6 +1,9 @@
 package com.alf452.recipeapp
 
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.fetchSemanticsNode
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -8,7 +11,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
-import androidx.compose.ui.test.printToLog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -44,14 +46,14 @@ class TimesMadeSurvivesEditTest {
         // increment broke instead of only "somewhere in these three taps".
         composeRule.onNodeWithText("Chili").performClick()
         composeRule.waitForIdle()
-        // Diagnostic: dump the FAB's actual semantics/text to the test's
-        // stdout before asserting, since assertTextContains's failure
-        // message doesn't include the node's actual text value.
-        composeRule.onNodeWithTag("times_made_fab").printToLog("FAB_DEBUG_initial")
+        // Diagnostic: print the FAB's actual text to stdout before asserting,
+        // since assertTextContains's failure message doesn't include the
+        // node's actual text value, only that it didn't match.
+        printFabText("initial")
         for (expected in 1..3) {
             composeRule.onNodeWithTag("times_made_fab").performClick()
             composeRule.waitForIdle()
-            composeRule.onNodeWithTag("times_made_fab").printToLog("FAB_DEBUG_after_tap_$expected")
+            printFabText("after_tap_$expected")
             composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it ${expected}×", substring = true)
         }
 
@@ -72,5 +74,12 @@ class TimesMadeSurvivesEditTest {
         composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("times_made_fab").assertTextContains("Made it 3×", substring = true)
+    }
+
+    private fun printFabText(label: String) {
+        val node = composeRule.onNodeWithTag("times_made_fab").fetchSemanticsNode()
+        val text = node.config.getOrNull(SemanticsProperties.Text)
+        val editableText = node.config.getOrNull(SemanticsProperties.EditableText)
+        println("FAB_DEBUG[$label] text=$text editableText=$editableText")
     }
 }
