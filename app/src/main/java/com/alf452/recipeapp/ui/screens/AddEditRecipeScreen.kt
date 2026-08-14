@@ -44,9 +44,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
-import com.alf452.recipeapp.ui.components.OutlinedText
-import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
-import com.alf452.recipeapp.ui.components.darkTextFieldColors
+import com.alf452.recipeapp.ui.components.slateTextFieldColors
+import com.alf452.recipeapp.ui.theme.RecipeSlate
+import com.alf452.recipeapp.ui.theme.RecipeSlateCard
 import com.alf452.recipeapp.util.createRecipePhotoUri
 import com.alf452.recipeapp.util.deletePhotoUri
 import kotlinx.coroutines.flow.Flow
@@ -138,110 +138,112 @@ fun AddEditRecipeScreen(
 
     val isEditing = existingRecipeFlow != null
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
-
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                TopAppBar(
-                    title = { Text(if (isEditing) "Edit Recipe" else "New Recipe") },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                if (title.isNotBlank()) {
-                                    val originalPhotoUri = existingRecipe?.photoUri
-                                    if (originalPhotoUri != null && originalPhotoUri != photoUri) {
-                                        deletePhotoUri(context, originalPhotoUri)
-                                    }
-                                    onSave(
-                                        Recipe(
-                                            id = id,
-                                            title = title.trim(),
-                                            category = category.trim(),
-                                            ingredients = ingredients.trim(),
-                                            instructions = instructions.trim(),
-                                            notes = notes.trim(),
-                                            photoUri = photoUri,
-                                            timesMade = timesMade,
-                                            isFavorite = isFavorite
-                                        )
-                                    )
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Filled.Check, contentDescription = "Save")
-                        }
+    Scaffold(
+        containerColor = RecipeSlate,
+        topBar = {
+            TopAppBar(
+                title = { Text(if (isEditing) "Edit Recipe" else "New Recipe") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = RecipeSlate,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
-                )
-            }
-        ) { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                PhotoPicker(
-                    photoUri = photoUri,
-                    onTakePhotoClick = { launchCamera() }
-                )
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (title.isNotBlank()) {
+                                val originalPhotoUri = existingRecipe?.photoUri
+                                if (originalPhotoUri != null && originalPhotoUri != photoUri) {
+                                    deletePhotoUri(context, originalPhotoUri)
+                                }
+                                onSave(
+                                    Recipe(
+                                        id = id,
+                                        title = title.trim(),
+                                        category = category.trim(),
+                                        ingredients = ingredients.trim(),
+                                        instructions = instructions.trim(),
+                                        notes = notes.trim(),
+                                        photoUri = photoUri,
+                                        timesMade = timesMade,
+                                        isFavorite = isFavorite
+                                    )
+                                )
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = "Save")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
+            PhotoPicker(
+                photoUri = photoUri,
+                onTakePhotoClick = { launchCamera() }
+            )
 
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") },
-                    colors = darkTextFieldColors(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                        .testTag("recipe_title_field")
-                )
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = { category = it },
-                    label = { Text("Category (optional)") },
-                    colors = darkTextFieldColors(),
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-                )
-                OutlinedTextField(
-                    value = ingredients,
-                    onValueChange = { ingredients = it },
-                    label = { Text("Ingredients") },
-                    placeholder = { Text("One per line") },
-                    colors = darkTextFieldColors(),
-                    minLines = 4,
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-                )
-                OutlinedTextField(
-                    value = instructions,
-                    onValueChange = { instructions = it },
-                    label = { Text("Instructions") },
-                    colors = darkTextFieldColors(),
-                    minLines = 6,
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-                )
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text("Notes (optional)") },
-                    colors = darkTextFieldColors(),
-                    minLines = 2,
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-                )
-                OutlinedText(
-                    text = "Title is required to save.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Title") },
+                colors = slateTextFieldColors(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .testTag("recipe_title_field")
+            )
+            OutlinedTextField(
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Category (optional)") },
+                colors = slateTextFieldColors(),
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+            )
+            OutlinedTextField(
+                value = ingredients,
+                onValueChange = { ingredients = it },
+                label = { Text("Ingredients") },
+                placeholder = { Text("One per line") },
+                colors = slateTextFieldColors(),
+                minLines = 4,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+            )
+            OutlinedTextField(
+                value = instructions,
+                onValueChange = { instructions = it },
+                label = { Text("Instructions") },
+                colors = slateTextFieldColors(),
+                minLines = 6,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+            )
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Notes (optional)") },
+                colors = slateTextFieldColors(),
+                minLines = 2,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+            )
+            Text(
+                text = "Title is required to save.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
@@ -253,7 +255,7 @@ private fun PhotoPicker(photoUri: String?, onTakePhotoClick: () -> Unit) {
             .fillMaxWidth()
             .height(180.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(RecipeSlateCard)
             .clickable { onTakePhotoClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -283,12 +285,12 @@ private fun PhotoPicker(photoUri: String?, onTakePhotoClick: () -> Unit) {
                 Icon(
                     Icons.Filled.PhotoCamera,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = Color.White
                 )
                 Text(
                     text = "Take a photo of the dish",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }

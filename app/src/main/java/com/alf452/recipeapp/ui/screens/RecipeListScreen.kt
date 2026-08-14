@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -43,11 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
-import com.alf452.recipeapp.ui.components.MarbleCountertopBackground
-import com.alf452.recipeapp.ui.components.OutlinedText
-import com.alf452.recipeapp.ui.components.WoodenCuttingBoardBackground
-import com.alf452.recipeapp.ui.theme.RecipeBrownDark
-import com.alf452.recipeapp.ui.theme.RecipeCream
+import com.alf452.recipeapp.ui.theme.RecipeSlate
+import com.alf452.recipeapp.ui.theme.RecipeSlateCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,68 +56,48 @@ fun RecipeListScreen(
 ) {
     val recipes by recipesFlow.collectAsState(initial = emptyList())
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        WoodenCuttingBoardBackground(modifier = Modifier.fillMaxSize())
-
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                Box {
-                    MarbleCountertopBackground(modifier = Modifier.matchParentSize())
-                    LargeTopAppBar(
-                        title = { Text("My Cookbook") },
-                        colors = TopAppBarDefaults.largeTopAppBarColors(
-                            containerColor = Color.Transparent,
-                            scrolledContainerColor = Color.Transparent,
-                            titleContentColor = RecipeBrownDark
-                        ),
-                        actions = {
-                            TopBarScrimIconButton(onClick = onImportClick) {
-                                Icon(Icons.Filled.Inbox, contentDescription = "Import Recipe", tint = Color.White)
-                            }
-                            TopBarScrimIconButton(onClick = onPantryClick) {
-                                Icon(Icons.Filled.Kitchen, contentDescription = "My Pantry", tint = Color.White)
-                            }
-                        }
-                    )
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = onAddClick) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add recipe")
-                }
-            }
-        ) { padding ->
-            if (recipes.isEmpty()) {
-                EmptyState(padding)
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(recipes, key = { it.id }) { recipe ->
-                        RecipeCard(recipe = recipe, onClick = { onRecipeClick(recipe.id) })
+    Scaffold(
+        containerColor = RecipeSlate,
+        topBar = {
+            LargeTopAppBar(
+                title = { Text("My Cookbook") },
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = RecipeSlate,
+                    scrolledContainerColor = RecipeSlate,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
+                actions = {
+                    IconButton(onClick = onImportClick) {
+                        Icon(Icons.Filled.Inbox, contentDescription = "Import Recipe")
+                    }
+                    IconButton(onClick = onPantryClick) {
+                        Icon(Icons.Filled.Kitchen, contentDescription = "My Pantry")
                     }
                 }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddClick) {
+                Icon(Icons.Filled.Add, contentDescription = "Add recipe")
             }
         }
-    }
-}
-
-@Composable
-private fun TopBarScrimIconButton(onClick: () -> Unit, content: @Composable () -> Unit) {
-    IconButton(onClick = onClick) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color.Black.copy(alpha = 0.28f)),
-            contentAlignment = Alignment.Center
-        ) {
-            content()
+    ) { padding ->
+        if (recipes.isEmpty()) {
+            EmptyState(padding)
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(recipes, key = { it.id }) { recipe ->
+                    RecipeCard(recipe = recipe, onClick = { onRecipeClick(recipe.id) })
+                }
+            }
         }
     }
 }
@@ -135,7 +111,7 @@ private fun EmptyState(padding: PaddingValues) {
         contentAlignment = Alignment.Center
     ) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = RecipeCream.copy(alpha = 0.92f)),
+            colors = CardDefaults.cardColors(containerColor = RecipeSlateCard),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(
@@ -146,16 +122,17 @@ private fun EmptyState(padding: PaddingValues) {
                     Icons.Filled.MenuBook,
                     contentDescription = null,
                     modifier = Modifier.padding(bottom = 12.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = Color.White
                 )
                 Text(
                     text = "No recipes yet",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
                 )
                 Text(
                     text = "Tap + to add your first recipe",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Color.White.copy(alpha = 0.7f)
                 )
             }
         }
@@ -167,7 +144,7 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color.Black),
+        colors = CardDefaults.cardColors(containerColor = RecipeSlateCard, contentColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -177,17 +154,18 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
             RecipeThumbnail(photoUri = recipe.photoUri)
 
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                OutlinedText(text = recipe.title, style = MaterialTheme.typography.titleMedium)
+                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium, color = Color.White)
                 if (recipe.category.isNotBlank()) {
                     Text(
                         text = recipe.category,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = Color.White.copy(alpha = 0.7f)
                     )
                 }
-                OutlinedText(
+                Text(
                     text = recipe.ingredients,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.85f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
@@ -203,7 +181,7 @@ private fun RecipeThumbnail(photoUri: String?) {
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+            .background(Color.White.copy(alpha = 0.12f)),
         contentAlignment = Alignment.Center
     ) {
         if (photoUri != null) {
@@ -217,7 +195,7 @@ private fun RecipeThumbnail(photoUri: String?) {
             Icon(
                 Icons.Filled.RestaurantMenu,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = Color.White
             )
         }
     }

@@ -5,17 +5,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 /**
- * Text field colors for use over the wooden cutting board / marble
- * backgrounds: black text/label/placeholder regardless of the device's
- * light/dark or Material You dynamic color scheme, since those backgrounds
- * aren't part of the theme's own surface colors.
+ * Text field colors for use over the flat slate-gray menu background: white
+ * text/label/placeholder/border regardless of the device's light/dark or
+ * Material You dynamic color scheme, since that background isn't part of
+ * the theme's own surface colors.
  */
 @Composable
-fun darkTextFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = Color.Black,
-    unfocusedTextColor = Color.Black,
-    focusedLabelColor = Color.Black,
-    unfocusedLabelColor = Color.Black,
-    focusedPlaceholderColor = Color.Black,
-    unfocusedPlaceholderColor = Color.Black
+fun slateTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = Color.White,
+    unfocusedTextColor = Color.White,
+    focusedLabelColor = Color.White,
+    unfocusedLabelColor = Color.White,
+    focusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+    unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+    focusedBorderColor = Color.White.copy(alpha = 0.7f),
+    unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
+    cursorColor = Color.White
 )
