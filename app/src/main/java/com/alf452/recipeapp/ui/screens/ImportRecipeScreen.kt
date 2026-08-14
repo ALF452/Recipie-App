@@ -27,11 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.data.toRecipe
 import com.alf452.recipeapp.ui.components.slateTextFieldColors
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeSlate
 import com.alf452.recipeapp.ui.theme.RecipeSlateCard
 import com.alf452.recipeapp.util.decodeSharedRecipe
@@ -46,6 +46,7 @@ fun ImportRecipeScreen(
     var rawText by rememberSaveable { mutableStateOf(initialSharedText.orEmpty()) }
     val parsed = remember(rawText) { decodeSharedRecipe(rawText) }
     var isImporting by rememberSaveable { mutableStateOf(false) }
+    val textColor = LocalRecipeTextColor.current
 
     Scaffold(
         containerColor = RecipeSlate,
@@ -54,9 +55,9 @@ fun ImportRecipeScreen(
                 title = { Text("Import Recipe") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = RecipeSlate,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = textColor,
+                    navigationIconContentColor = textColor,
+                    actionIconContentColor = textColor
                 ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -77,7 +78,7 @@ fun ImportRecipeScreen(
                 text = "Got a recipe from another My Cookbook user? Paste the message they sent you below, " +
                     "or share it into the app directly from your messaging or email app.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
+                color = textColor
             )
 
             OutlinedTextField(
@@ -96,28 +97,28 @@ fun ImportRecipeScreen(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(parsed.title, style = MaterialTheme.typography.titleMedium, color = Color.White)
+                            Text(parsed.title, style = MaterialTheme.typography.titleMedium, color = textColor)
                             if (parsed.category.isNotBlank()) {
                                 Text(
                                     parsed.category,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.7f)
+                                    color = textColor.copy(alpha = 0.7f)
                                 )
                             }
                             Text(
                                 "Ingredients",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White,
+                                color = textColor,
                                 modifier = Modifier.padding(top = 12.dp)
                             )
-                            Text(parsed.ingredients, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                            Text(parsed.ingredients, style = MaterialTheme.typography.bodyMedium, color = textColor)
                             Text(
                                 "Instructions",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White,
+                                color = textColor,
                                 modifier = Modifier.padding(top = 12.dp)
                             )
-                            Text(parsed.instructions, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                            Text(parsed.instructions, style = MaterialTheme.typography.bodyMedium, color = textColor)
                         }
                     }
 

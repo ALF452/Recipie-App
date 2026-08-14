@@ -36,11 +36,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.ui.components.slateTextFieldColors
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeSlate
 import kotlinx.coroutines.flow.Flow
 
@@ -54,6 +54,7 @@ fun PantryScreen(
 ) {
     val pantryItems by pantryItemsFlow.collectAsState(initial = emptyList())
     var newItemName by rememberSaveable { mutableStateOf("") }
+    val textColor = LocalRecipeTextColor.current
 
     fun submitNewItem() {
         if (newItemName.isNotBlank()) {
@@ -69,9 +70,9 @@ fun PantryScreen(
                 title = { Text("My Pantry") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = RecipeSlate,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = textColor,
+                    navigationIconContentColor = textColor,
+                    actionIconContentColor = textColor
                 ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -90,7 +91,7 @@ fun PantryScreen(
             Text(
                 text = "Add the food, spices, and herbs you have on hand. Recipe ingredients will be highlighted green when you already have them, red when you don't.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
+                color = textColor
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -108,7 +109,7 @@ fun PantryScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = { submitNewItem() }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add item", tint = Color.White)
+                    Icon(Icons.Filled.Add, contentDescription = "Add item", tint = textColor)
                 }
             }
 
@@ -120,7 +121,7 @@ fun PantryScreen(
                     Text(
                         text = "Your pantry is empty.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = textColor.copy(alpha = 0.7f)
                     )
                 }
             } else {
@@ -135,11 +136,11 @@ fun PantryScreen(
                             Text(
                                 text = item.name,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color.White,
+                                color = textColor,
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = { onDeleteItem(item) }) {
-                                Icon(Icons.Filled.Delete, contentDescription = "Remove ${item.name}", tint = Color.White)
+                                Icon(Icons.Filled.Delete, contentDescription = "Remove ${item.name}", tint = textColor)
                             }
                         }
                         HorizontalDivider()

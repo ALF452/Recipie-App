@@ -8,7 +8,17 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+
+/**
+ * The user's chosen text/icon color for the slate-gray menu screens (picked
+ * via the palette button next to My Pantry / Import Recipe). Provided once
+ * at the app root so every screen reads the same live value without each
+ * one needing it threaded through as an explicit parameter.
+ */
+val LocalRecipeTextColor = compositionLocalOf { Color.White }
 
 private val LightColors = lightColorScheme(
     primary = RecipeBrown,

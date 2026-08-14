@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -45,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
 import com.alf452.recipeapp.ui.components.slateTextFieldColors
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeSlate
 import com.alf452.recipeapp.ui.theme.RecipeSlateCard
 import com.alf452.recipeapp.util.createRecipePhotoUri
@@ -137,6 +137,7 @@ fun AddEditRecipeScreen(
     }
 
     val isEditing = existingRecipeFlow != null
+    val textColor = LocalRecipeTextColor.current
 
     Scaffold(
         containerColor = RecipeSlate,
@@ -145,9 +146,9 @@ fun AddEditRecipeScreen(
                 title = { Text(if (isEditing) "Edit Recipe" else "New Recipe") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = RecipeSlate,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = textColor,
+                    navigationIconContentColor = textColor,
+                    actionIconContentColor = textColor
                 ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -241,7 +242,7 @@ fun AddEditRecipeScreen(
             Text(
                 text = "Title is required to save.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.7f),
+                color = textColor.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
@@ -281,16 +282,17 @@ private fun PhotoPicker(photoUri: String?, onTakePhotoClick: () -> Unit) {
                 )
             }
         } else {
+            val textColor = LocalRecipeTextColor.current
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     Icons.Filled.PhotoCamera,
                     contentDescription = null,
-                    tint = Color.White
+                    tint = textColor
                 )
                 Text(
                     text = "Take a photo of the dish",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
+                    color = textColor,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }

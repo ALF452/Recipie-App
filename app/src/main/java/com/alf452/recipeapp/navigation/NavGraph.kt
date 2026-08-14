@@ -47,7 +47,8 @@ fun RecipeNavGraph(viewModel: RecipeViewModel) {
                 onAddClick = { navController.navigate(Routes.ADD) },
                 onRecipeClick = { id -> navController.navigate(Routes.detail(id)) },
                 onPantryClick = { navController.navigate(Routes.PANTRY) },
-                onImportClick = { navController.navigate(Routes.IMPORT) }
+                onImportClick = { navController.navigate(Routes.IMPORT) },
+                onTextColorChange = { color -> viewModel.setTextColor(color) }
             )
         }
 

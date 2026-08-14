@@ -1,7 +1,10 @@
 package com.alf452.recipeapp.ui
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.alf452.recipeapp.data.PantryItem
@@ -12,17 +15,35 @@ import com.alf452.recipeapp.data.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
+private const val PREFS_NAME = "app_settings"
+private const val KEY_TEXT_COLOR = "text_color_argb"
+
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = RecipeDatabase.getInstance(application)
     private val repository: RecipeRepository = RecipeRepository(database.recipeDao())
     private val pantryRepository: PantryRepository = PantryRepository(database.pantryDao())
+    private val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     val allRecipes: Flow<List<Recipe>> = repository.allRecipes
     val allPantryItems: Flow<List<PantryItem>> = pantryRepository.allItems
 
     /** Text handed off from an incoming share intent, waiting to be reviewed on the Import screen. */
     val pendingSharedText = mutableStateOf<String?>(null)
+
+    /** User-selected text/icon color for the menu screens, persisted across launches. */
+    val textColor = mutableStateOf(
+        if (prefs.contains(KEY_TEXT_COLOR)) {
+            Color(prefs.getInt(KEY_TEXT_COLOR, Color.White.toArgb()))
+        } else {
+            Color.White
+        }
+    )
+
+    fun setTextColor(color: Color) {
+        textColor.value = color
+        prefs.edit().putInt(KEY_TEXT_COLOR, color.toArgb()).apply()
+    }
 
     fun setPendingSharedText(text: String?) {
         pendingSharedText.value = text

@@ -8,9 +8,12 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.alf452.recipeapp.navigation.RecipeNavGraph
 import com.alf452.recipeapp.ui.RecipeViewModel
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,9 +46,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun RecipeAppRoot(viewModel: RecipeViewModel) {
+    val textColor by viewModel.textColor
     RecipeAppTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            RecipeNavGraph(viewModel = viewModel)
+        CompositionLocalProvider(LocalRecipeTextColor provides textColor) {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                RecipeNavGraph(viewModel = viewModel)
+            }
         }
     }
 }

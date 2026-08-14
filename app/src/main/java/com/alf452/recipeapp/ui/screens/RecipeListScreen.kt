@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +34,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +46,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.components.TextColorPickerDialog
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeSlate
 import com.alf452.recipeapp.ui.theme.RecipeSlateCard
 
@@ -52,9 +58,12 @@ fun RecipeListScreen(
     onAddClick: () -> Unit,
     onRecipeClick: (Long) -> Unit,
     onPantryClick: () -> Unit,
-    onImportClick: () -> Unit
+    onImportClick: () -> Unit,
+    onTextColorChange: (Color) -> Unit
 ) {
     val recipes by recipesFlow.collectAsState(initial = emptyList())
+    var showColorPicker by remember { mutableStateOf(false) }
+    val textColor = LocalRecipeTextColor.current
 
     Scaffold(
         containerColor = RecipeSlate,
@@ -64,11 +73,14 @@ fun RecipeListScreen(
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = RecipeSlate,
                     scrolledContainerColor = RecipeSlate,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = textColor,
+                    navigationIconContentColor = textColor,
+                    actionIconContentColor = textColor
                 ),
                 actions = {
+                    IconButton(onClick = { showColorPicker = true }) {
+                        Icon(Icons.Filled.Palette, contentDescription = "Text Color")
+                    }
                     IconButton(onClick = onImportClick) {
                         Icon(Icons.Filled.Inbox, contentDescription = "Import Recipe")
                     }
@@ -100,10 +112,19 @@ fun RecipeListScreen(
             }
         }
     }
+
+    if (showColorPicker) {
+        TextColorPickerDialog(
+            currentColor = textColor,
+            onColorSelected = onTextColorChange,
+            onDismiss = { showColorPicker = false }
+        )
+    }
 }
 
 @Composable
 private fun EmptyState(padding: PaddingValues) {
+    val textColor = LocalRecipeTextColor.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -122,17 +143,17 @@ private fun EmptyState(padding: PaddingValues) {
                     Icons.Filled.MenuBook,
                     contentDescription = null,
                     modifier = Modifier.padding(bottom = 12.dp),
-                    tint = Color.White
+                    tint = textColor
                 )
                 Text(
                     text = "No recipes yet",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    color = textColor
                 )
                 Text(
                     text = "Tap + to add your first recipe",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = textColor.copy(alpha = 0.7f)
                 )
             }
         }
@@ -141,10 +162,11 @@ private fun EmptyState(padding: PaddingValues) {
 
 @Composable
 private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
+    val textColor = LocalRecipeTextColor.current
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = RecipeSlateCard, contentColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = RecipeSlateCard, contentColor = textColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -154,18 +176,18 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
             RecipeThumbnail(photoUri = recipe.photoUri)
 
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium, color = Color.White)
+                Text(text = recipe.title, style = MaterialTheme.typography.titleMedium, color = textColor)
                 if (recipe.category.isNotBlank()) {
                     Text(
                         text = recipe.category,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = textColor.copy(alpha = 0.7f)
                     )
                 }
                 Text(
                     text = recipe.ingredients,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = textColor.copy(alpha = 0.85f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
@@ -177,11 +199,12 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
 
 @Composable
 private fun RecipeThumbnail(photoUri: String?) {
+    val textColor = LocalRecipeTextColor.current
     Box(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.White.copy(alpha = 0.12f)),
+            .background(textColor.copy(alpha = 0.12f)),
         contentAlignment = Alignment.Center
     ) {
         if (photoUri != null) {
@@ -195,7 +218,7 @@ private fun RecipeThumbnail(photoUri: String?) {
             Icon(
                 Icons.Filled.RestaurantMenu,
                 contentDescription = null,
-                tint = Color.White
+                tint = textColor
             )
         }
     }

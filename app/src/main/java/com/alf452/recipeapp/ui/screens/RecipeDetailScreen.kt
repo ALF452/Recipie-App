@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.alf452.recipeapp.data.PantryItem
 import com.alf452.recipeapp.data.Recipe
+import com.alf452.recipeapp.ui.theme.LocalRecipeTextColor
 import com.alf452.recipeapp.ui.theme.RecipeSlate
 import com.alf452.recipeapp.util.buildShareText
 import com.alf452.recipeapp.util.createRecipePhotoUri
@@ -76,6 +77,7 @@ fun RecipeDetailScreen(
     val pantryItems by pantryItemsFlow.collectAsState(initial = emptyList())
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val textColor = LocalRecipeTextColor.current
 
     val current = recipe ?: return
 
@@ -113,9 +115,9 @@ fun RecipeDetailScreen(
                 title = { Text(current.title) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = RecipeSlate,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = textColor,
+                    navigationIconContentColor = textColor,
+                    actionIconContentColor = textColor
                 ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -192,7 +194,7 @@ fun RecipeDetailScreen(
             Text(
                 text = "Ingredients",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                color = textColor,
                 modifier = Modifier.padding(top = 16.dp)
             )
 
@@ -204,7 +206,7 @@ fun RecipeDetailScreen(
                 Text(
                     text = current.ingredients,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
+                    color = textColor,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             } else {
@@ -218,21 +220,21 @@ fun RecipeDetailScreen(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-            Text(text = "Instructions", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            Text(text = "Instructions", style = MaterialTheme.typography.titleMedium, color = textColor)
             Text(
                 text = current.instructions,
                 style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
+                color = textColor,
                 modifier = Modifier.padding(top = 4.dp)
             )
 
             if (current.notes.isNotBlank()) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-                Text(text = "Notes", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                Text(text = "Notes", style = MaterialTheme.typography.titleMedium, color = textColor)
                 Text(
                     text = current.notes,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
+                    color = textColor,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
@@ -282,6 +284,6 @@ private fun IngredientRow(text: String, inStock: Boolean) {
             modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyLarge, color = Color.White)
+        Text(text = text, style = MaterialTheme.typography.bodyLarge, color = LocalRecipeTextColor.current)
     }
 }
